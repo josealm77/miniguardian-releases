@@ -30,7 +30,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-6)
+## Install the beta (0.9.1-beta-7)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -38,24 +38,24 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-6 && cd ~/miniguard-0.9.1-beta-6
-for f in miniguard_0.9.1-beta-6_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-6/$f
+mkdir -p ~/miniguard-0.9.1-beta-7 && cd ~/miniguard-0.9.1-beta-7
+for f in miniguard_0.9.1-beta-7_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-7/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-6_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-7_amd64.deb
 ```
 
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-6 && cd ~/miniguard-0.9.1-beta-6
-for f in miniguard-0.9.1-6.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-6/$f
+mkdir -p ~/miniguard-0.9.1-beta-7 && cd ~/miniguard-0.9.1-beta-7
+for f in miniguard-0.9.1-7.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-7/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-6.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-7.x86_64.rpm
 ```
 
 `gpg --verify` must print **Good signature from "Jayce Automata Research"**
@@ -69,6 +69,46 @@ Then open the dashboard with `sudo miniguard-status` and run an AI tool
 governed with `sudo mg-cli claude` (or `opencode`, and others). Start with the
 [TUI User Guide](docs/TUI_USER_GUIDE.md) and the
 [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md).
+
+## Uninstall
+
+**Ubuntu, Pop!_OS, Debian**
+```bash
+sudo apt purge miniguard     # removes everything, including daemon state and keys
+# or: sudo apt remove miniguard   (keeps state in /var/lib/jayce/miniguard for a later reinstall)
+```
+
+**Fedora, RHEL, AlmaLinux, Rocky**
+```bash
+sudo dnf remove miniguard
+sudo rm -rf /var/lib/jayce/miniguard   # RPM has no purge: delete the state by hand
+```
+
+Removal lifts the seal first: it stops the services, unlocks the immutable
+files and directories, and removes the read-only mount on `/usr/local/bin`.
+It then undoes the host changes MiniGuardian made: the `hidepid` line it
+added to `/etc/fstab` (a `hidepid` line you added yourself is kept) and the
+browser integration files. **Kernel lockdown** stays at `integrity` until
+the next reboot, because Linux cannot lower it on a running system;
+MiniGuardian never changes your kernel command line, so a reboot restores
+the default.
+
+These steps apply to 0.9.1-beta-7 and later. Removing beta-6 or earlier needs
+the seal lifted by hand first, because those versions' removal scripts were
+incomplete:
+
+```bash
+sudo systemctl stop miniguard-sentinel miniguard
+sudo mg-seal --unseal
+while findmnt /usr/local/bin >/dev/null; do sudo umount -l /usr/local/bin; done
+sudo chattr -i /etc/miniguard /usr/local/bin /usr/share/miniguard /opt/jayce 2>/dev/null
+for f in $(dpkg -L miniguard) /etc/miniguard/*; do [ -e "$f" ] && sudo chattr -i "$f"; done
+sudo apt purge -y miniguard
+sudo sed -i '/^# MiniGuardian sealed deployment — hidepid=2$/{N;/\nproc \/proc proc defaults,hidepid=2 0 0$/d}' /etc/fstab
+grep -q hidepid /etc/fstab || sudo mount -o remount,hidepid=0 /proc
+sudo rm -rf /var/lib/jayce/miniguard
+sudo systemctl daemon-reload
+```
 
 ## Documentation
 
