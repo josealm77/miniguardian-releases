@@ -30,28 +30,40 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install a beta
+## Install the beta (0.9.1-beta-5)
 
-Download the package, the checksums, the signature and the public key from the
-latest release, then verify before installing:
+Copy and paste the block for your distro. It downloads the package, the
+checksums, the signature and the public key, verifies them, and installs only
+if everything checks out.
 
+**Ubuntu, Pop!_OS, Debian**
 ```bash
+mkdir -p ~/miniguard-0.9.1-beta-5 && cd ~/miniguard-0.9.1-beta-5
+for f in miniguard_0.9.1-beta-5_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-5/$f
+done
 gpg --import JAYCE_RELEASE.asc
-gpg --verify SHA256SUMS.asc SHA256SUMS
-sha256sum -c SHA256SUMS --ignore-missing
+gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
+  && sudo apt install ./miniguard_0.9.1-beta-5_amd64.deb
 ```
 
-The signing key is **Jayce Automata Research**, fingerprint
-`962F D600 CF52 4AA8 B610  E06B 7D7E E65D 52E1 182E`. Check it matches before
-trusting a signature.
-
+**Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-# Ubuntu, Pop!_OS, Debian
-sudo apt install ./miniguard_<version>_amd64.deb
-
-# Fedora, RHEL, AlmaLinux, Rocky
-sudo dnf install ./miniguard-<version>.x86_64.rpm
+mkdir -p ~/miniguard-0.9.1-beta-5 && cd ~/miniguard-0.9.1-beta-5
+for f in miniguard-0.9.1-5.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-5/$f
+done
+gpg --import JAYCE_RELEASE.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
+  && sudo dnf install ./miniguard-0.9.1-5.x86_64.rpm
 ```
+
+`gpg --verify` must print **Good signature from "Jayce Automata Research"**
+using key `962FD600CF524AA8B610E06B7D7EE65D52E1182E`
+(`962F D600 CF52 4AA8 B610  E06B 7D7E E65D 52E1 182E`). If it says BAD, or
+shows a different key, stop and don't install. A warning that the key "is not
+certified with a trusted signature" is normal the first time; comparing the
+fingerprint above is what establishes trust.
 
 Then open the dashboard with `sudo miniguard-status` and run an AI tool
 governed with `sudo mg-cli claude` (or `opencode`, and others). Start with the
