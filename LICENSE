@@ -1,0 +1,122 @@
+# Jayce Automata Research Source License v1.0
+
+Copyright (c) 2026 Jose Almendarez / Jayce Automata Research
+All rights reserved.
+
+DEFINITIONS
+
+"Software" means the MiniGuardian security suite source code — the daemon,
+sentinel, terminals, consoles, and all workspace crates (miniguard,
+miniguard-status, trust_core, trust_terminal, jvc_compressor, jayce_kernel,
+cosmic_map, apodeixis, astraxis) — plus documentation, scripts, artifacts,
+and all associated files in this repository.
+
+"Jayce Automata Research" means Jose Almendarez and the Jayce Automata Research project.
+
+"Commercial Use" means any use of the Software, in whole or in part, for
+direct or indirect commercial advantage or monetary compensation.
+
+"Weaponization" means any use of the Software, in whole or in part, to design,
+develop, test, deploy, or support offensive weapons, autonomous attack systems,
+surveillance infrastructure used to harm individuals, or any system intended to
+cause physical, digital, or psychological harm to persons.
+
+GRANT OF RIGHTS
+
+Subject to the terms and conditions of this License, Jayce Automata Research grants you
+a limited, non-exclusive, non-transferable, revocable right to:
+
+  1. View and study the Software for personal learning and research.
+  2. Run the Software in a personal development or evaluation environment.
+
+No other rights are granted. In particular, you may not fork, modify, or
+create derivative works of the Software except under a separate written
+agreement with Jayce Automata Research.
+
+CONDITIONS
+
+All exercise of rights granted above must comply with all of the following:
+
+  a. ATTRIBUTION. Any copy or build of the Software made under these grants
+     must prominently display: "Built on Jayce — Copyright (c) 2026 Jose Almendarez
+     / Jayce Automata Research. All rights reserved."
+
+  b. NO COMMERCIAL USE. Commercial Use of the Software, in whole or in part,
+     requires prior written permission from Jayce Automata Research. To request a
+     commercial license, contact: <mailto:JayceAutomataResearch@proton.me>
+
+  c. NO REDISTRIBUTION. You may not redistribute, publish, sublicense, sell,
+     or make publicly available the Software or any derivative work without
+     prior written permission from Jayce Automata Research.
+
+  d. NO WEAPONIZATION. Weaponization of the Software is strictly and
+     unconditionally prohibited. This prohibition is non-waivable and cannot
+     be overridden by any commercial license, agreement, or permission from
+     Jayce Automata Research. No party has authority to grant permission for
+     Weaponization under any circumstance.
+
+  e. GATE INTEGRITY. Any public claim of gate scores, security scores,
+     determinism scores, certification readiness, or promotion status derived
+     from the Software must be backed by artifacts produced by running the
+     official gate and rubric scripts in this repository unmodified. Fabricated
+     or manually adjusted score claims are prohibited.
+
+  f. ETHICS PRESERVATION. Any derivative work, personality layer, or system
+     built above the Software must not remove, suppress, or circumvent the
+     fail-closed promotion policy, the capability gate model, the weaponization
+     prohibition, or the constitutional invariant constraints documented in the
+     Software.
+
+RESERVATION OF RIGHTS
+
+All rights not expressly granted in this License are reserved by Jayce Automata Research.
+This includes, without limitation:
+
+- The right to publish or distribute the Software.
+- The right to use the Jayce or Jayce Automata Research name or logo.
+- The right to make commercial use of the Software.
+- The right to embed the Software in products or services.
+
+UPDATES AND DISTRIBUTION
+
+Official releases are published at:
+<https://www.jayceautomata.com/releases/>
+
+Only releases signed with the official Jayce Automata Research developer key and
+distributed via the official site are authorized releases. Third-party
+redistribution of release packages is prohibited without written permission.
+
+DISCLAIMER OF WARRANTIES
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL JAYCE
+AUTOMATA BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+TERMINATION
+
+Your rights under this License terminate automatically and immediately if you
+violate any condition of this License, including the weaponization prohibition.
+Upon termination, you must destroy all copies of the Software in your possession.
+
+GOVERNING LAW
+
+This License shall be governed by the laws of the jurisdiction in which Jose
+Almendarez resides, without regard to conflict of law provisions.
+
+CONTACT
+
+Jayce Automata Research
+Website: <https://www.jayceautomata.com>
+Licensing: <mailto:JayceAutomataResearch@proton.me>
+
+---
+
+NOTE ON THIRD-PARTY CODE: This repository builds on third-party open-source
+crates which remain under their own licenses (MIT, Apache-2.0, BSD, ISC,
+Zlib, Unicode-3.0, OFL-1.1, and others). Those components are attributed in
+THIRD_PARTY_NOTICES.md, with their license texts under licenses/. The Jayce
+Automata Research Source License applies to the Software, not to those third-party
+components.
