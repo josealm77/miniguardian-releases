@@ -1126,6 +1126,53 @@ non-root session still gets real governance, not a downgraded one.
 - **Self-integrity.** `mg-cli` verifies itself against a signed manifest
   (`SELF_INTEGRITY_TRUSTED_KEY`) as the first thing in `main()`.
 
+### 14.12 Recognised AI programs
+
+**Any program can be governed**: `sudo mg-cli <program>` sandboxes whatever
+you launch through it. Recognition changes what happens around it:
+- a recognised AI tool gets the curated `/dev` automatically, so its builds
+  work inside governance;
+- it gets the session menu (share data, network) at launch;
+- Claude Code gets its own isolated config copy;
+- the daemon's passive scan flags recognised AI processes that were **not**
+  launched through `mg-cli`, and `[auto_govern]` can prompt you to relaunch
+  them governed.
+
+Detection (`mg_ai_detector.rs`) checks, in order, and stops at the first match:
+
+1. **Adapter registry** (`ai_adapters.rs`; tools with known session-state
+   paths and model endpoints): opencode, claude, aider, vscode, zed, cursor,
+   windsurf, ollama, continue, cline, cody, devin, gemini, copilot.
+2. **AI editors** (name or name prefix): code, code-insiders, zed, cursor,
+   windsurf, devin, vscodium, lapce, positron, trae, kiro, qoder, pearai,
+   melty, idx, antigravity, lovable, bolt, qodo.
+3. **AI command-line tools and agents** (name contains): ollama, openai,
+   anthropic, anus, lmstudio, copilot, copilot-agent, cline, continue,
+   opencode, claude, aider, cody, gemini, codex, grok, kilo, qwen, sgpt,
+   shell-gpt, mentat, plandex, gpt-pilot, interpreter, swe-agent, devika,
+   tabnine, supermaven, codeium, blackbox, bito, refact, fauxpilot, wingman,
+   amazon-q, autogen, crewai, metagpt, chatdev, langgraph, agy, minimax,
+   moonshot, deepseek, fireworks, together, anypoint, replit, bolt, v0.
+4. **Command-line hints**: an argument containing `--ai`, `--copilot`,
+   `--model`, `chat` or `completion`. Reported as a custom model process.
+5. **Model API keys in the environment** (the catch-all for unknown tools):
+   `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `DEEPSEEK_API_KEY`, `COPILOT_TOKEN`,
+   `OLLAMA_HOST`, `LMSTUDIO_PORT`, `DEVIN_API_KEY`, `CURSOR_API_KEY`,
+   `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY`, `GROQ_API_KEY`,
+   `MISTRAL_API_KEY`, `COHERE_API_KEY`, `TOGETHER_API_KEY`,
+   `FIREWORKS_API_KEY`, `PERPLEXITY_API_KEY`, `XAI_API_KEY`,
+   `DASHSCOPE_API_KEY`, `AZURE_OPENAI_API_KEY`, `HF_TOKEN`,
+   `HUGGINGFACE_API_KEY`, `REPLICATE_API_TOKEN`.
+
+Name matching uses the name you typed, even when the install is a versioned
+file such as `…/claude/versions/2.1.278`. The matches are loose on purpose:
+`code` also matches `codex`, and a tool whose name merely contains one of the
+words above is treated as AI. The result is that the tool gets the stricter
+AI defaults, never looser ones. To add a tool, add an adapter entry in
+`ai_adapters.rs` (preferred) or a name to the lists in `mg_ai_detector.rs`.
+The daemon-side tools an AI can call through the approval gate are a separate
+list: see the [Governed Tools Reference](GOVERNED_TOOLS_REFERENCE.md).
+
 ## 15. See Also
 
 - `docs/archive/AI_CONTAINMENT_PIPELINE_ESSAY.md` — architectural essay

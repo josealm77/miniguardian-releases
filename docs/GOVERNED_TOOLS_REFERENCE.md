@@ -6,6 +6,11 @@
 
 ## What Is the Governed Tool System?
 
+> This page covers the **29 tools an AI can call** through MiniGuardian's
+> approval gate. For **which AI programs** MiniGuardian recognises and governs
+> (Claude Code, opencode, Cursor, Aider, and 60+ more), see the
+> [AI Containment Manual §14.12](AI_CONTAINMENT_MANUAL.md#1412-recognised-ai-programs).
+
 The **Embedded Tool System** (`ToolRegistry` in `trust_terminal/src/terminal/smart_terminal/tool_system.rs`) is MiniGuardian's native, in-process alternative to external MCP servers. When an AI agent runs under MiniGuardian governance (via `mg-cli`), **this is the tool system it uses**.
 
 Every tool invocation passes through five security layers before any side effect occurs:
