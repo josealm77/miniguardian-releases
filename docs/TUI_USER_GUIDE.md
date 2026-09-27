@@ -93,8 +93,33 @@ canonical kernel sources through the `jayce_kernel` port.
 | **Env Mode** | kernel environment mode: `normal / degraded / essential / error` |
 | **Caps Denied** | capability denials (attempts blocked by the capability broker) |
 | **Bound. Viol** | filesystem/net boundary violations (red when >0) |
+| **Exposed svc** | programs that other machines on your network can reach (listening on `0.0.0.0`, `::` or a public address). `N (checked, normal)` in green means each was checked and registered as a normal service; the first few are listed below it. `N (M need attention)` in yellow means at least one has a risk sign (see below). |
+
+**Exposed services.** The first time a program listens on the network with no
+risk signs (for example a local text-to-speech or development server), it is
+*registered* in `/var/lib/jayce/miniguard/exposure_registry.json` and logged
+once as a normal finding. After that it is silent. It is reported as a real
+concern (Medium) only when:
+- a different program takes over a registered port;
+- the program runs from a temporary folder or a deleted file;
+- a listening port has no owning process on two scans in a row (possible
+  hidden process);
+- a root program runs from outside the system folders;
+- the port is one commonly used by attack tools (1337, 4444, 31337, …).
+
+To have a service checked again, delete its entry from the registry file. If
+a registered service only needs to be used on this computer, bind it to
+`127.0.0.1` instead of `0.0.0.0`.
 
 ### Active Threats
+
+Only real concerns appear here, from `LOW` to `CRITICAL`. When MiniGuardian
+checks something unusual and finds it normal, for example a program loading a
+library it unpacked into its own private temp folder, or a newly registered
+network service, it does **not** list it here. Such findings are counted in
+the title (`✓ N checked, normal`) and recorded as `ALLOW` in the Audit Trail,
+so nothing that has been cleared looks like a problem. With nothing to report
+the panel says "No active threats."
 
 A live feed of events, each row: `[SEVERITY] timestamp PID source  description`.
 Severity is color-coded (`LOW`…`CRITICAL`). PID is omitted when 0 (system-wide
