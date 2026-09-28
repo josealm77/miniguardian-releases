@@ -47,13 +47,14 @@ gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missi
   && sudo apt install ./miniguard_0.9.1-beta-11_amd64.deb
 ```
 
-> [!WARNING]
-> !!! FEDORA RPM INSTALLATION NEEDS TO BE UPDATED !!!
-> This Fedora/RHEL/AlmaLinux/Rocky RPM install snippet is legacy beta material
-> and must be reviewed and revalidated against the current Fedora packaging
-> and installation flow before use.
-
 <!-- fedora-install-start -->
+> **WARNING: FEDORA RPM INSTALLATION NEEDS REVIEW**
+>
+> !!! This Fedora / RHEL / AlmaLinux / Rocky RPM install snippet is legacy
+> beta material and must be reviewed and revalidated against the current
+> packaging and installation flow before use. Do NOT use this RPM build or
+> installation procedure without verification.
+
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
 mkdir -p ~/miniguard-0.9.1-beta-11 && cd ~/miniguard-0.9.1-beta-11
