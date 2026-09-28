@@ -48,9 +48,9 @@ gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missi
 ```
 
 <!-- fedora-install-start -->
-> **WARNING: FEDORA RPM INSTALLATION NEEDS REVIEW**
+> **WARNING: FEDORA RPM INSTALLATION — REQUIRES UPDATE BEFORE DEPLOYMENT**
 >
-> !!! This Fedora / RHEL / AlmaLinux / Rocky RPM install snippet is legacy
+> !!! REQUIRES UPDATE BEFORE DEPLOYMENT — This Fedora / RHEL / AlmaLinux / Rocky RPM install snippet is legacy
 > beta material and must be reviewed and revalidated against the current
 > packaging and installation flow before use. Do NOT use this RPM build or
 > installation procedure without verification.
