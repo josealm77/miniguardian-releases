@@ -30,7 +30,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-10)
+## Install the beta (0.9.1-beta-11)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -38,25 +38,27 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-10 && cd ~/miniguard-0.9.1-beta-10
-for f in miniguard_0.9.1-beta-10_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-10/$f
+mkdir -p ~/miniguard-0.9.1-beta-11 && cd ~/miniguard-0.9.1-beta-11
+for f in miniguard_0.9.1-beta-11_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-11/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-10_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-11_amd64.deb
 ```
 
+<!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-10 && cd ~/miniguard-0.9.1-beta-10
-for f in miniguard-0.9.1-10.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-10/$f
+mkdir -p ~/miniguard-0.9.1-beta-11 && cd ~/miniguard-0.9.1-beta-11
+for f in miniguard-0.9.1-11.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-11/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-10.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-11.x86_64.rpm
 ```
+<!-- fedora-install-end -->
 
 `gpg --verify` must print **Good signature from "Jayce Automata Research"**
 using key `962FD600CF524AA8B610E06B7D7EE65D52E1182E`
@@ -69,6 +71,21 @@ Then open the dashboard with `sudo miniguard-status` and run an AI tool
 governed with `sudo mg-cli claude` (or `opencode`, and others). Start with the
 [TUI User Guide](docs/TUI_USER_GUIDE.md) and the
 [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md).
+
+### Fedora: blank screen after reboot (beta-5 to beta-10)
+
+On Fedora Workstation, beta-5 to beta-10 could stop at a blank screen with a
+cursor after the first reboot. Fixed in beta-11. If it happened to you, boot
+a Fedora live USB, open a terminal, and remove the line the installer added:
+
+```bash
+lsblk -f                                         # find the large btrfs partition, e.g. nvme0n1p3
+sudo mount -o subvol=root /dev/nvme0n1p3 /mnt    # use the partition you found
+sudo sed -i '/^# MiniGuardian sealed deployment — hidepid=2$/{N;/\nproc \/proc proc defaults,hidepid=2 0 0$/d}' /mnt/etc/fstab
+sudo umount /mnt
+```
+
+Reboot, then install beta-11 (upgrading also removes that line).
 
 ## Uninstall
 
