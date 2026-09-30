@@ -85,7 +85,7 @@ sudo sed -i '/^# MiniGuardian sealed deployment — hidepid=2$/{N;/\nproc \/proc
 sudo umount /mnt
 ```
 
-Reboot, then install beta-11 (upgrading also removes that line).
+Reboot, then install the latest beta above (upgrading also removes that line).
 
 ## Uninstall
 
