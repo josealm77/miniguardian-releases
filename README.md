@@ -30,7 +30,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-12)
+## Install the beta (0.9.1-beta-13)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -38,25 +38,25 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-12 && cd ~/miniguard-0.9.1-beta-12
-for f in miniguard_0.9.1-beta-12_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-12/$f
+mkdir -p ~/miniguard-0.9.1-beta-13 && cd ~/miniguard-0.9.1-beta-13
+for f in miniguard_0.9.1-beta-13_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-13/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-12_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-13_amd64.deb
 ```
 
 <!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-12 && cd ~/miniguard-0.9.1-beta-12
-for f in miniguard-0.9.1-12.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-12/$f
+mkdir -p ~/miniguard-0.9.1-beta-13 && cd ~/miniguard-0.9.1-beta-13
+for f in miniguard-0.9.1-13.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-13/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-12.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-13.x86_64.rpm
 ```
 <!-- fedora-install-end -->
 
