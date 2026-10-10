@@ -1109,8 +1109,9 @@ non-root session still gets real governance, not a downgraded one.
   by `mg_hooks_registration.rs`; workspace-scoped hooks are ignored upstream,
   antigravity-cli#1036) routes each event to the right concurrent session. It
   also refcounts the shared governed proxy. `mg-cli` auto-spawns it and expects
-  the binary installed beside `mg-cli` (neither `deploy.sh` nor `seal.sh`
-  installs it yet). The shared `hooks.json` entry is merged, never overwritten,
+  the binary installed beside `mg-cli` (`/usr/local/bin/mg-session-hub`; shipped
+  by the .deb/.rpm and `deploy.sh`, hashed by `seal.sh`). Without it agy's hook
+  finds no session and allows — check it is present after any manual install. The shared `hooks.json` entry is merged, never overwritten,
   and removed only when the last session deregisters. It is a free-tier piece —
   not the paid `mg_collaboration` daemon.
 - **Egress inspection.** `mg_network_monitor.rs` runs the hop-scan and

@@ -6,7 +6,7 @@
 
 ## What Is the Governed Tool System?
 
-> This page covers the **29 tools an AI can call** through MiniGuardian's
+> This page covers the **31 tools an AI can call** through MiniGuardian's
 > approval gate. For **which AI programs** MiniGuardian recognises and governs
 > (Claude Code, opencode, Cursor, Aider, and 60+ more), see the
 > [AI Containment Manual §14.12](AI_CONTAINMENT_MANUAL.md#1412-recognised-ai-programs).
@@ -87,7 +87,7 @@ The `mg-mcp-bridge` binary fronts the daemon's `ToolRegistry` to any Model Conte
 MCP client ──STDIO(MCP JSON-RPC)──> mg-mcp-bridge ──AF_UNIX(token)──> daemon tool:invoke ──> ToolRegistry
 ```
 
-- `tools/list` advertises all 29 tools with JSON schemas
+- `tools/list` advertises all 31 tools with JSON schemas
 - `tools/call` maps to `tool:invoke <name> <json>` on the auth socket
 - Write/exec/delete/network calls return MCP `remotePending: true` with the approval ID
 - Approval stays human-owned and out-of-band — no MCP client can auto-approve its own mutations
@@ -187,17 +187,21 @@ whose literal *or symlink-resolved* form is sensitive — shell rc files, `.ssh`
 `/root`, `/run`, MiniGuardian's own state, and similar. Deletes and moves are
 only ever approved by an explicit rule.
 
-## Complete Tool List (29 Tools)
+## Complete Tool List (31 Tools)
 
 > **Ported from the Jayce SDK.** The TRust Smart Terminal was vendored from the SDK's
 > `trust_core` into the `trust_terminal` crate, and the governed-tool layer was
 > extended here (covert-channel hard-deny, taint window, fixed `PATH` for
-> `run_command`). The SDK registers four more tool families that this build does
-> **not** register: action/editing (`action_tools`), browser (`browser_tools`),
-> research/ingest pipeline (`research_tools`) and web development (`web_tools`), about
-> 5,200 lines in total (tool names include `governed_fetch`, `governed_scrape`,
-> `governed_run`, `browser_action_click`, `browser_governed_js_eval`). No document or
-> changelog records why they were left out. The 29 tools below are what this build offers.
+> `run_command`). The SDK registers four more tool families. From the action/editing
+> family, `batch_edit` and `apply_template` were ported (2026-10-07, reworked; see
+> "Multi-File and Template Tools" below). The rest of that family was left out because
+> its tools did not do what they said: `smart_edit`, `refactor_code` and
+> `semantic_patch` reported "applied" for operations they never performed or did by
+> plain substring replacement, `structured_insert` replaced an unparseable JSON file
+> with `{}`, `governed_run` claimed network/CPU/file isolation it never set up, and
+> `governed_fs_action` deleted every empty file in a folder as "unused assets";
+> `safe_replace` duplicates `doc_regex_replace`. The browser, research and web
+> families are under review. The 31 tools below are what this build offers.
 
 ### Read-Only Tools (10) — Auto-approve, still audited
 
@@ -251,6 +255,17 @@ These tools carry sealed Apodeixis missions that proof-check arguments before ex
 | `doc_replace_range` | Replace a range of lines (start..end inclusive) | `path` (required), `start_line` (required), `end_line` (required), `content` (required) | Required |
 | `doc_regex_replace` | Replace all regex matches in a document | `path` (required), `pattern` (required), `new` (required), `count` (optional, 0=all) | Required |
 | `doc_format_edit` | Edit a heading-delimited section (markdown/list aware) | `path` (required), `section` (required), `content` (required) | Required |
+
+---
+
+### Multi-File and Template Tools (2) — require human approval
+
+Paths are relative to the workspace; absolute paths and `..` are refused.
+
+| Tool | Description | Parameters | Approval |
+|------|-------------|------------|----------|
+| `batch_edit` | Same edit in several files: `replace` (literal), `regex_replace`, or `remove_lines` (drop lines containing the pattern). Files without a match are left untouched; one bad path refuses the whole batch before any write. Max 100 files. | `paths` (required, comma-separated), `operation` (required), `pattern` (required), `new` (optional) | Required |
+| `apply_template` | Create a new file from a template (`rust_crate`, `python_pkg`, `config_toml`, `plugin_manifest`, `readme`). Never overwrites: fails if the file exists. | `path` (required), `template` (required), `variables` (optional, `name=..,author=..,description=..`) | Required |
 
 ---
 
@@ -334,7 +349,7 @@ Agent invokes tool
 | Capability | Auto-execute? | Examples |
 |-----------|--------------|----------|
 | `ReadOnly` | Yes (audited) | read_file, list_files, grep, tree, glob, file_metadata, list_env, getenv, git_status, doc_read_lines |
-| `WriteFile` | No (approval required) | write_file, edit_file, append_file, apply_patch, create_dir, copy_file, move_file, doc_insert_line, doc_replace_range, doc_regex_replace, doc_format_edit |
+| `WriteFile` | No (approval required) | write_file, edit_file, append_file, apply_patch, create_dir, copy_file, move_file, doc_insert_line, doc_replace_range, doc_regex_replace, doc_format_edit, batch_edit, apply_template |
 | `ExecuteCommand` | No (approval required) | run_command |
 | `DeleteFile` | No (approval required, double-confirm) | delete_file |
 | `NetworkAccess` | No (approval required) | network_fetch |
@@ -416,7 +431,7 @@ sudo cp target/x86_64-unknown-linux-musl/release/mg-mcp-bridge /usr/local/bin/
 
 Architecture: `MCP client ──STDIO(MCP JSON-RPC)──> mg-mcp-bridge ──AF_UNIX(token)──> daemon`
 
-- Advertises all 29 tools with JSON schemas
+- Advertises all 31 tools with JSON schemas
 - Write/exec/delete/network calls return MCP `remotePending: true`
 - Approval stays human-owned — no MCP client can auto-approve its own mutations
 - No third-party code bundled; uses the open MCP protocol as a plain client
@@ -425,7 +440,7 @@ Architecture: `MCP client ──STDIO(MCP JSON-RPC)──> mg-mcp-bridge ──A
 
 ## Files
 
-- `trust_terminal/src/terminal/smart_terminal/tool_system.rs` — ToolRegistry core, all 29 tools, missions, audit
+- `trust_terminal/src/terminal/smart_terminal/tool_system.rs` — ToolRegistry core, 29 of the 31 tools (the other 2 in `action_tools.rs`), missions, audit
 - `miniguard/src/bin/mg_trust_tool.rs` — CLI access to the tool system via daemon socket
 - `miniguard/src/bin/mg_mcp_bridge.rs` — MCP bridge for any MCP-capable client
 - `miniguard/src/approval_prompt.rs` + `scripts/mg-approval-prompt.sh` — desktop Review pop-up

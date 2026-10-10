@@ -169,6 +169,7 @@ findings. Never becomes an exfiltration channel — excerpts show at most a
 | `secret.slack_token` | `xoxb-`, `xoxp-` | 20 |
 | `secret.stripe_live` | `sk_live_` | 24 |
 | `secret.google_api_key` | `AIza` | - |
+| `secret.anthropic_api_key` | `sk-ant-` | 40 |
 | `secret.private_key_block` | `-----BEGIN ... PRIVATE KEY-----` | - |
 
 **Output:** `ScanVerdict` with:
@@ -193,7 +194,7 @@ either auto-allowed, blocked, or sent for human approval.
 **Adapters:**
 | Adapter | AI Tool |
 |---------|---------|
-| `claude.js` | Claude Code |
+| ~~`claude.js`~~ | Claude Code — **superseded**, see governed sessions (`mg-cli`) |
 | `cline.js` | Cline |
 | `continue.js` | Continue.dev |
 | `cursor.js` | Cursor |
@@ -218,6 +219,18 @@ Detects installed AI tools and installs the plugin for each. Logs and
 approvals stored in `~/.local/share/trust-ai/`.
 
 ---
+
+### 8. opencode companion plugins
+Shipped in `plugins/opencode/plugins/`, loaded by opencode alongside `miniguard-firewall.js`:
+- **`mg-collab-plugin.js`** — team-chat bridge for opencode via `mg-chat-bridge` (`127.0.0.1:8767`): `editors`, `status`, `summary`, `tasks`, `chat`, `reply`.
+- **`project-compass.js`** — stay-on-track discipline: re-injects the mission brief on compaction, nudges plan-less grinding, flags dependency mutations. Fail-open.
+- **`lib/mg-opencode-compat.js`** — `dualPlugin()` lets every MiniGuardian opencode plugin load unchanged on opencode 1.x and 2.x.
+
+### 9. Integrations (outside `plugins/`)
+`integrations/` holds editor/browser integrations that are not daemon plugins:
+`browser-guard` (governed browser webextension enforcing `[browser_guard]`),
+`jar-shield` (standalone browser extension), `vscode` and `zed` (mg-chat-bridge examples),
+`devin-cli` / `devin-desktop`, and the `mg-chat-hook` user-level chat hook.
 
 ## Common Patterns
 

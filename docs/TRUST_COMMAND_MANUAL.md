@@ -42,7 +42,7 @@ These commands run locally inside `trust-terminal` and directly interface with t
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| **`forensic`** | `forensic [YYYY-MM-DD]` | Generates an **Executive Forensic Summary Report** by date. |
+| **`forensic`** | `forensic [today\|yesterday\|YYYY-MM-DD] [origin agent\|covert\|content\|system]` | Incident review from the daemon's audit chain: chain integrity, enforcement counters, and the newest audit entries with who started each one — **agent request** (an AI asked through a governed tool), **covert action** (caught without the AI asking), **external content** (quarantined input), **system** (the daemon's own host detectors). Day and origin filter the entries. Needs the daemon, so run the terminal with `sudo`; without it the command says nothing was checked. |
 | **`forensics`** | `forensics` | Alias for `forensic`. |
 | **`report`** | `report` | Alias for `forensic`. |
 | **`forensic --json`** | `forensic --json` or `forensic raw` | Dumps the full, unformatted raw JSON daemon evidence payload. |
