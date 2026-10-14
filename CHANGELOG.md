@@ -2,6 +2,39 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-22 — Tue Oct 13 2026
+
+- Added `mg-mcp-broker`, a small root sidecar that lets any MCP client (opencode included) use the governed tools without needing the daemon's secret key. It only answers processes that are part of a governed session, and it is installed and started as its own service.
+- Added `tool_status`: when a tool waits for your approval, the agent can now ask for the result after you approve it, instead of only ever learning it had been queued.
+- Fixed: the daemon's management socket and key file did not appear on the host, so the status TUI, the broker and socket commands could not reach the daemon.
+- Fixed: desktop notifications and clipboard tools failed inside the daemon ("Cannot autolaunch D-Bus without X11 $DISPLAY") because a root system service has no access to your desktop session. They now go through the same desktop helper the approval pop-ups already use.
+- Fixed: the `memory_search` and `memory_recall` tools always failed with "unknown command".
+- Fixed: approved builds (`run_tests`, `lint`, `build`) could run forever without a time limit, and could not find `cargo`.
+- Approved tools that fail now report the real error instead of "unknown status".
+
+## 0.9.1-beta-21 — Mon Oct 12 2026
+
+- Set `MINIGUARD_LOG_STDERR=1` to mirror the daemon's error log to stderr. It also prints the child's Landlock network profile, which is what you need to diagnose a governed session that can't reach a loopback port.
+
+## 0.9.1-beta-20 — Mon Oct 12 2026
+
+- Fixed a fresh install where governed identity provisioning failed: the restricted systemd service PATH has no `/usr/sbin`, so `groupadd`/`useradd`/`setfacl` were never found. They are now called by absolute path.
+- Added the `MINIGUARD_LOG_STDERR` environment variable for debugging startup failures.
+
+## 0.9.1-beta-19 — Mon Oct 12 2026
+
+- Fixed the packaged default config: the plugin uid/gid did not match the governed identity, so a fresh install with both subsystems enabled exited fatally at startup.
+
+## 0.9.1-beta-18 — Sun Oct 11 2026
+
+- Fixed the systemd unit so the daemon can start on a fresh install. It was not allowed to write to cgroups, so governed identity provisioning could not create its own cgroup and the daemon died on startup.
+
+## 0.9.1-beta-17 — Sun Oct 11 2026
+
+- Governed identity is now enabled and provisioned by default on a fresh install.
+- A tool call the daemon deceived about now exits 203 with a machine-readable `# MG_SYNTHETIC` marker instead of an ambiguous failure.
+- Download guard: copies rather than moves the file it holds, clears the exec bits on the original, skips duplicates, applies a 7-day TTL and a 1 GiB total cap, and refuses in-progress `.part` downloads. This fixes the empty-hash race during a release download.
+
 ## 0.9.1-beta-16 — Fri Oct 09 2026
 
 - Harden seal.sh: daemon and sentinel binaries are now installed chmod 750 before chattr +i, so unprivileged local users can no longer copy them for offline static analysis. User-facing helpers (mg-cli, miniguard-status) remain world-executable.

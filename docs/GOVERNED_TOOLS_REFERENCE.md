@@ -6,7 +6,7 @@
 
 ## What Is the Governed Tool System?
 
-> This page covers the **31 tools an AI can call** through MiniGuardian's
+> This page covers the **51 tools an AI can call** through MiniGuardian's
 > approval gate. For **which AI programs** MiniGuardian recognises and governs
 > (Claude Code, opencode, Cursor, Aider, and 60+ more), see the
 > [AI Containment Manual §14.12](AI_CONTAINMENT_MANUAL.md#1412-recognised-ai-programs).
@@ -87,7 +87,7 @@ The `mg-mcp-bridge` binary fronts the daemon's `ToolRegistry` to any Model Conte
 MCP client ──STDIO(MCP JSON-RPC)──> mg-mcp-bridge ──AF_UNIX(token)──> daemon tool:invoke ──> ToolRegistry
 ```
 
-- `tools/list` advertises all 31 tools with JSON schemas
+- `tools/list` advertises all 51 tools with JSON schemas
 - `tools/call` maps to `tool:invoke <name> <json>` on the auth socket
 - Write/exec/delete/network calls return MCP `remotePending: true` with the approval ID
 - Approval stays human-owned and out-of-band — no MCP client can auto-approve its own mutations
@@ -187,7 +187,7 @@ whose literal *or symlink-resolved* form is sensitive — shell rc files, `.ssh`
 `/root`, `/run`, MiniGuardian's own state, and similar. Deletes and moves are
 only ever approved by an explicit rule.
 
-## Complete Tool List (31 Tools)
+## Complete Tool List (51 Tools)
 
 > **Ported from the Jayce SDK.** The TRust Smart Terminal was vendored from the SDK's
 > `trust_core` into the `trust_terminal` crate, and the governed-tool layer was
@@ -200,10 +200,10 @@ only ever approved by an explicit rule.
 > plain substring replacement, `structured_insert` replaced an unparseable JSON file
 > with `{}`, `governed_run` claimed network/CPU/file isolation it never set up, and
 > `governed_fs_action` deleted every empty file in a folder as "unused assets";
-> `safe_replace` duplicates `doc_regex_replace`. The browser, research and web
-> families are under review. The 31 tools below are what this build offers.
+> `safe_replace` duplicates `doc_regex_replace`. The 51 tools below are what this
+> build offers.
 
-### Read-Only Tools (10) — Auto-approve, still audited
+### Read-Only Tools (17) — Auto-approve, still audited
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
@@ -217,8 +217,15 @@ only ever approved by an explicit rule.
 | `list_env` | List environment variable names | *(no parameters)* |
 | `getenv` | Read the value of an environment variable | `name` (required) |
 | `git_status` | Read-only git status for the current repo | `path` (optional) |
+| `git_log` | Show recent git commit history | `path` (required), `count` (optional, default 10), `args` (optional) |
+| `git_diff` | Show working-tree or ref-range diff | `path` (required), `ref` (optional) |
+| `git_blame` | Show line-by-line authorship for a file | `path` (required), `start_line` (optional), `end_line` (optional) |
+| `systemctl_status` | Show systemd status for a service | `service` (required) |
+| `clipboard_read` | Read the desktop clipboard | *(no parameters)* |
+| `memory_search` | Semantic search over the `mg-mem` knowledge graph | `query` (required), `top_k` (optional, default 5) |
+| `memory_recall` | List or search memories by tag | `tag` (optional), `limit` (optional, default 20) |
 
-### Write Tools (8) — Require human approval
+### Write Tools (10) — Require human approval
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
@@ -230,19 +237,42 @@ only ever approved by an explicit rule.
 | `copy_file` | Copy a file or directory to a destination | `source` (required), `destination` (required), `recursive` (optional) |
 | `move_file` | Move or rename a file or directory | `source` (required), `destination` (required) |
 | `delete_file` | Delete a file | `path` (required) |
+| `git_commit` | Stage all changes and create a git commit | `path` (required), `message` (required) |
+| `screenshot` | Capture a screenshot to a file | `output` (required) |
 
-### Execute Tools (2) — Require human approval
+### Execute Tools (5) — Require human approval
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
 | `run_command` | Run a shell command | `command` (required), `cwd` (optional) |
 | `setenv` | Set an environment variable; empty value unsets it | `name` (required), `value` (optional) |
+| `run_tests` | Run the project's test suite (auto-detects cargo/npm/etc) | `path` (required), `tool` (optional), `args` (optional) |
+| `lint` | Run the project's linter (auto-detects cargo/npm/etc) | `path` (required), `tool` (optional), `args` (optional) |
+| `build` | Build the project (auto-detects cargo/npm/make/go) | `path` (required), `tool` (optional), `args` (optional) |
 
-### Network Tools (1) — Require human approval
+### Network Tools (6) — Require human approval
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
 | `network_fetch` | Fetch a URL over HTTP(S), bounded response | `url` (required), `max_bytes` (optional, default 8192, hard cap 1 MiB) |
+| `web_search` | Search the web (DuckDuckGo lite fallback; configure `MINIGUARD_SEARCH_API` for structured results) | `query` (required), `count` (optional, default 5) |
+| `browser_visit` | Fetch a rendered page (Chromium headless, fallback to curl) | `url` (required), `max_bytes` (optional, default 200 KB) |
+| `rss_fetch` | Fetch an RSS/Atom feed | `url` (required), `count` (optional, default 10) |
+| `git_push` | Push the current branch to its upstream | `path` (required), `remote` (optional, default `origin`), `branch` (optional) |
+| `send_email` | Send a plain-text email via sendmail/msmtp if configured | `to` (required), `subject` (required), `body` (required), `from` (optional) |
+
+### System / Desktop Tools (2) — Require human approval
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `send_notification` | Send a desktop notification to the operator | `title` (required), `body` (required), `urgency` (optional, default `normal`) |
+| `clipboard_write` | Write text to the desktop clipboard | `text` (required) |
+
+### Memory Management (1) — Requires human approval
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `memory_forget` | Delete a memory entry from the `mg-mem` graph by id | `id` (required) |
 
 ### Governed Document Tools (5) — Apodeixis mission-gated
 
