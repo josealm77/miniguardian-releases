@@ -2,6 +2,13 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-26 — Fri Nov 06 2026
+
+- Fixed: after every start MiniGuardian reported its kernel programs as tampered with and reloaded them. The check now verifies them the right way, and the false warnings and reloads are gone.
+- When something pauses (freezes) the MiniGuardian daemon, the evidence now lists the root programs that could have done it (terminal shells and debugging tools) instead of unrelated system services.
+- The AI behaviour posture now has one consistent name, and every change of it is recorded in the audit log with its cause.
+- `mg-explain`: new `--until=TIME` option to look at one short moment in the past; `--dig` no longer treats MiniGuardian itself as a suspect after a freeze.
+
 ## 0.9.1-beta-25 — Fri Nov 06 2026
 
 - New `mg-explain` command: `sudo mg-explain [since] [--dig]` explains what MiniGuardian decided and why — every threat-state change with the events that caused it, audit decisions, held kills, downloads waiting for you, seal state and recent warnings. `--dig` follows the evidence through fixed, read-only checks to a one-line conclusion. It changes nothing.
