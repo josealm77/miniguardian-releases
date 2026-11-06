@@ -2,6 +2,20 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-23 — Thu Nov 05 2026
+
+- TRust terminal: commands that printed nothing now work, or say plainly that they are not available in this build. The help menu is reorganised by topic.
+- TRust terminal: new commands that show real data only — host and daemon status, the brain's state and recent decisions, AI governance counts; notes, todo, timers, focus and saved sessions; project scaffolding, dependencies, workspace overview and a Markdown reader; web fetch/search and weather (run as you, refused while MiniGuardian is in a threat state, private host-only history that needs your password to view); a local network overview.
+- TRust terminal: the code analyzers print a short summary instead of thousands of lines, with many false alarms removed.
+- TRust terminal: `build`, `check` and `test` explain failures automatically — cause, file and line, what was ruled out, and the one command that verifies a fix — and keep a compressed history that notices repeated causes. `test` runs only what changed since the last passing run.
+- TRust terminal: the window layout follows the window width (it stayed narrow when maximised).
+- Fixed: a brief false PARANOID state after the daemon restarted.
+- Fixed: a routine system update held the dashboard at HOSTILE; a changed system file re-alerted on every scan; every web connection raised a certificate alert; false "audit chain tamper" warnings.
+- Kills of processes MiniGuardian cannot verify are now held for your decision, with the process's network cut off meanwhile.
+- New scheduled-job coverage (cron folders, user crontabs, at jobs, new timers); a suspicious scheduled job is set aside and you are asked, instead of it being deleted.
+- The approvals page explains each request in plain English: who is asking, what exactly, and what Approve and Reject do.
+- Kernel hardening settings are applied again, and the daemon uses about half the CPU it did.
+
 ## 0.9.1-beta-22 — Tue Oct 13 2026
 
 - Added `mg-mcp-broker`, a small root sidecar that lets any MCP client (opencode included) use the governed tools without needing the daemon's secret key. It only answers processes that are part of a governed session, and it is installed and started as its own service.
