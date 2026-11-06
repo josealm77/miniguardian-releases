@@ -2,6 +2,12 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-25 — Fri Nov 06 2026
+
+- New `mg-explain` command: `sudo mg-explain [since] [--dig]` explains what MiniGuardian decided and why — every threat-state change with the events that caused it, audit decisions, held kills, downloads waiting for you, seal state and recent warnings. `--dig` follows the evidence through fixed, read-only checks to a one-line conclusion. It changes nothing.
+- The approvals page now says when auto-approve is turned off in the configuration, and pressing `w` explains how to turn it on, instead of a message that disappeared.
+- The code analyzer no longer reports normal test vocabulary ("dummy", "stub") in test code.
+
 ## 0.9.1-beta-24 — Fri Nov 06 2026
 
 - Fixed: on Fedora 44 the daemon did not start (the status page showed "disconnected"): systemd refused to set up the service under SELinux. If you installed beta-23 on Fedora, update to this release.

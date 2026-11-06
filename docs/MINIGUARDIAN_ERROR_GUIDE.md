@@ -4,6 +4,7 @@
 ---
 
 ## 📋 Table of Contents
+0. [First step: ask MiniGuardian what it decided and why](#0-first-step-ask-miniguardian-what-it-decided-and-why)
 1. [TUI Status & Socket Connection Errors](#1-tui-status--socket-connection-errors)
 2. [Audit Trail & Process Gate Event Alerts](#2-audit-trail--process-gate-event-alerts)
 3. [Ransomware & Storage Protection Alerts](#3-ransomware--storage-protection-alerts)
@@ -12,6 +13,27 @@
 6. [Quick Remediation Commands](#6-quick-remediation-commands)
 
 ---
+
+## 0. First step: ask MiniGuardian what it decided and why
+
+Before re-running tests or guessing, run:
+
+```
+sudo mg-explain            # last 30 minutes (or: 2h, 90s, a unix time)
+sudo mg-explain 2h --dig   # follow the evidence down to a cause
+```
+
+It prints, from what the daemon already records: every change of the threat
+state **with the events that caused it**, audit decisions, held kills and
+network containment, downloads waiting for a decision, deception and seal
+state, and recent warnings. `--dig` follows that evidence through fixed,
+read-only checks to a one-line conclusion per trigger; a "stopped at" line
+names what is not recorded yet. It changes nothing. Needs `socat` and
+`python3` (installed with the package).
+
+In the TRust terminal, `build`, `check` and `test` do the same for code: a
+failure prints a fix summary (cause, file and line, what was ruled out, the
+one command that verifies a fix); `fixes` lists past summaries.
 
 ## 1. TUI Status & Socket Connection Errors
 
