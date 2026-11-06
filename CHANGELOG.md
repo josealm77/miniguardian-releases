@@ -2,6 +2,11 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-24 — Fri Nov 06 2026
+
+- Fixed: on Fedora 44 the daemon did not start (the status page showed "disconnected"): systemd refused to set up the service under SELinux. If you installed beta-23 on Fedora, update to this release.
+- Fixed: the kernel hardening settings file was missing from the packages, so installs from a package ran without it. It is now installed with the package.
+
 ## 0.9.1-beta-23 — Thu Nov 05 2026
 
 - TRust terminal: commands that printed nothing now work, or say plainly that they are not available in this build. The help menu is reorganised by topic.
