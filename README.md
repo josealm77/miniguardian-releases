@@ -30,7 +30,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-26)
+## Install the beta (0.9.1-beta-27)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -38,25 +38,25 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-26 && cd ~/miniguard-0.9.1-beta-26
-for f in miniguard_0.9.1-beta-26_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-26/$f
+mkdir -p ~/miniguard-0.9.1-beta-27 && cd ~/miniguard-0.9.1-beta-27
+for f in miniguard_0.9.1-beta-27_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-27/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-26_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-27_amd64.deb
 ```
 
 <!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-26 && cd ~/miniguard-0.9.1-beta-26
-for f in miniguard-0.9.1-26.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-26/$f
+mkdir -p ~/miniguard-0.9.1-beta-27 && cd ~/miniguard-0.9.1-beta-27
+for f in miniguard-0.9.1-27.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-27/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-26.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-27.x86_64.rpm
 ```
 <!-- fedora-install-end -->
 
@@ -67,7 +67,12 @@ shows a different key, stop and don't install. A warning that the key "is not
 certified with a trusted signature" is normal the first time; comparing the
 fingerprint above is what establishes trust.
 
-Then open the dashboard with `sudo miniguard-status` and run an AI tool
+Then tell MiniGuardian what the machine is for — `sudo mg-setup` (workstation,
+server, drone or vehicle; it picks the protection numbers and the folders that
+get ransomware pre-write copies). Until you do, the dashboard says "profile not
+chosen".
+
+Open the dashboard with `sudo miniguard-status` and run an AI tool
 governed with `sudo mg-cli claude` (or `opencode`, and others). Start with the
 [TUI User Guide](docs/TUI_USER_GUIDE.md) and the
 [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md).

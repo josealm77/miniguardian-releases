@@ -67,6 +67,42 @@ one command that verifies a fix); `fixes` lists past summaries.
 | `Ransomware  ON  15 pids  682 events  0 high` | **ACTIVE (CALM)** | **Normal browser/system activity**. High event counts come from Chrome, LevelDB, or IndexedDB caching. **`0 high`** means zero threat! |
 | `Ransomware  ON  X pids  Y events  3 high` | **HIGH ALERT** | **Suspicious bulk-encryption detected!** High write-rate entropy burst detected across processes. |
 
+### A program stopped responding: MiniGuardian paused it (beta-27)
+
+MiniGuardian keeps a copy of a file in your protected folders (chosen with
+`sudo mg-setup`; workstation default: Documents, Desktop, Pictures) just
+before it is overwritten. A program that overwrites 50 or more existing files
+there within 5 seconds is **paused** at once (ransomware does exactly that).
+Real package managers and backup tools, root processes, and your terminal
+shell are never paused this way. Tools that legitimately rewrite many files in
+place — whole-project formatters, code generators, some test suites — can be.
+
+```bash
+sudo mg-op ransomware list                 # what was paused, with its pid
+sudo mg-op ransomware explain <pid>        # every check the rule made, and which one decided
+sudo mg-op ransomware resume <pid>         # it was yours: let it continue
+sudo mg-op ransomware restore-since 30 /home/<you>/Documents/project   # put files back (only under that folder)
+```
+
+A paused program's binary is remembered: the same file is refused from any
+path afterwards ("Operation not permitted"). If that was your own tool:
+`sudo mg-op immunity list`, then `sudo mg-op immunity release <id>`.
+
+### "profile not chosen — run sudo mg-setup"
+
+MiniGuardian does not guess what the machine is for. `sudo mg-setup` asks
+(workstation / server / drone / vehicle, how strict, management IPs for a
+server, which folders get pre-write copies) and writes
+`/etc/miniguard/profile.toml`; your `miniguard.toml` is not changed. Re-run it
+any time; it only changes what you change.
+
+### Why didn't MiniGuardian act?
+
+`sudo mg-explain 15m` has a **near misses** section: detectors that came at
+least halfway to acting (value / threshold). If the daemon stops starting,
+the **crash trail** section shows the last startup stage it reached, the files
+it was loading, and the crash lines from the journal.
+
 ---
 
 ## 4. Apodeixis Code Interpreter & Proof Errors

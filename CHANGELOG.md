@@ -2,6 +2,20 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-27 — Sat Nov 07 2026
+
+**Attack immunity: what MiniGuardian stops once, it stops at the first step next time** — after a restart, and when the same thing comes back under a different name or path.
+
+- **Ransomware.** Files in your protected folders are copied just before they are overwritten. A program overwriting 50 or more existing files there within 5 seconds is paused immediately — including scripts that start one small helper per file, and programs that detach themselves first. Put files back with `sudo mg-op ransomware restore-since <minutes> <folder>`. The paused program's file is remembered and refused from then on.
+- **Malicious programs.** A binary MiniGuardian confirmed as malicious is refused from any path, even renamed or copied.
+- **Downloads and scheduled jobs.** A download you rejected is quarantined at once if it shows up again (even renamed); a scheduled job MiniGuardian held is held on sight if it is planted again under another name.
+- **Floods.** During a connection flood, unknown addresses are limited to a small number of new connections each; existing connections, known UDP traffic and your management addresses always pass (IPv4).
+- **Choose your deployment.** `sudo mg-setup` asks what the machine is for (workstation, server, drone, vehicle) and sets the numbers; the Ubuntu/Debian installer can ask for you. Until a profile is chosen, the dashboard says so. Your existing `miniguard.toml` is never rewritten.
+- **New command `mg-op`** for operator actions: `sudo mg-op ransomware list | resume <pid> | explain <pid>`, `sudo mg-op immunity list | release <id>`.
+- **Easier to investigate:** `mg-explain` now shows what came close to triggering but did not ("near misses"), and if the daemon cannot start, how far it got and why.
+- **Heads-up:** tools that rewrite many existing files in your protected folders very quickly (whole-project formatters, code generators, some test suites) can be paused. `sudo mg-op ransomware resume <pid>` lets them continue; see the Error and Recovery Guide.
+- Fixed: a start-up crash loop after a saved-state reload; a dashboard hazard that lit at random; false "not in baseline" alarms after system updates.
+
 ## 0.9.1-beta-26 — Fri Nov 06 2026
 
 - Fixed: after every start MiniGuardian reported its kernel programs as tampered with and reloaded them. The check now verifies them the right way, and the false warnings and reloads are gone.

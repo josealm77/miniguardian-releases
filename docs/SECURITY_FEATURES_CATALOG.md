@@ -466,9 +466,20 @@ files, network endpoints, verdict, severity) with **edit-distance similarity
 matching** to recall "seen-before" attack shapes, `matches_known_attack`,
 threat-score prediction (`predict_and_update`), component host/risk models, and
 **impossible-state invariants** (`InvariantCheck`: NeverWithCapability,
-NeverCoexist, NeverModified, MaxRisk, MaxCapabilities, Custom). Backed by
-`memory_graph.rs` (JVC-compressed archive, HMAC integrity). This is the learning
-substrate the self-learning feedback loops (§7) feed.
+NeverCoexist, NeverModified, MaxRisk, MaxCapabilities, Custom).
+
+What it does today:
+- **Persisted** at `brain/attack_memory.json` (JVC archive with an HMAC entry),
+  saved every 5 minutes and at shutdown; every save's outcome is shown by
+  `mg-explain` ("attack memory save: ok at …" / "failed …: reason").
+- **Learns with or without the Jayce kernel link.** Each daemon tick's alerts
+  are recorded. (Until 2026-11-07 it learned only while the trust link was
+  connected, so on a host without the sidecar it never learned or saved.)
+- **Acting on a known-pattern match goes through the kernel link** (capability
+  restrict). With the link down the response is logged as "not sent";
+  containing the identified actor locally is not built yet.
+- Restart-proof blocking of what was stopped is the immunity ledger's job
+  (§7.7), not attack memory's.
 
 ### 5.8 Deception in the AI-tool launch path & surfaces
 - `mg_cli_governor` runs **illusion bubble → Apodeixis mission → scorecard**
@@ -590,11 +601,44 @@ evidence into it under pressure.
 - **`updater_safe.rs`** — update-path safety gating (see §10).
 
 ### 7.6 The self-learning feedback loop
-The 4-layer loop **converts every attack into hardening**:
-`1. Attack memory & threat graph` (EWMA scores) → `2. Autonomous escalation`
-(eBPF drop, sandboxing, **deception layer**) → `3. State hardening` (thresholds,
-profiles) → `4. Feedback-driven tuning` (adaptive thresholds, baseline
-rebuilding). Every probe strengthens rather than merely alarms.
+Four layers: `1. Attack memory & threat graph` (EWMA scores, §5.7) →
+`2. Autonomous escalation` (eBPF drop, sandboxing, **deception layer**) →
+`3. State hardening` (thresholds, profiles) → `4. Feedback-driven tuning`
+(adaptive thresholds, baseline rebuilding).
+
+What becomes **lasting** hardening — surviving a restart and matching the same
+attack from another path or name — is exactly what the immunity ledger records
+(§7.7). Everything else in the loop adapts the running daemon only.
+
+### 7.7 Attack immunity (`immunity_ledger.rs`, `exec_gate.rs`, `vault.rs`, `flood_mode.rs`)
+One HMAC-protected store (`brain/immunity.json`) of what was stopped, re-applied
+at every start, matched by **content**, never by name:
+
+| Kind | Recorded when | Next time |
+|---|---|---|
+| `exec` | rooted malware confirmed, ransomware frozen, operator `immunity block-exec` | the exec gate (fanotify `FAN_OPEN_EXEC_PERM`) refuses that payload from any path; system locations and interpreters are never denied |
+| `ip` | network fast-path block, brain block, void-pit deploy (local fallback when the trust link is down) | re-blocked in XDP at start; expires per profile (30 d workstation, 7 d server) |
+| `download` | the owner rejects a quarantined download | the same content arriving again — even under an allow-listed name — is quarantined and decided at once ("rejected before") |
+| `persist_path` | a scheduled job is held | the same job content planted under any name is held and marked "seen before" |
+
+Around it:
+- **Ransomware.** The vault copies a file before a write in the protected
+  folders (chosen with `mg-setup`). A writer — or a script forking one child per
+  file — making 50 overwrites in 5 s is frozen at once. The tick-time rule then
+  confirms (incident) or resumes it. `ransomware restore-since <min> <folder>`
+  puts files back. `ransomware explain <pid>` replays the decision rule step by
+  step.
+- **Flood mode.** When aggregate new connections cross the profile trigger, XDP
+  limits unknown sources to the profile's allowance. Established TCP, known UDP
+  flows, peers that connected before the flood, and the management allowlist
+  always pass. IPv4 only.
+- **Profiles.** `mg-setup` writes `/etc/miniguard/profile.toml` (flood and
+  immunity numbers), layered over `miniguard.toml`. Until one is chosen the
+  system says "profile not chosen".
+- **Proof.** `scripts/mg_repeat_drill.sh` runs each containing scenario, restarts
+  the daemon, and repeats it from a different path/name. Each repeat must be
+  stopped at the first step with a ledger hit (ransomware: files restored
+  byte-for-byte).
 
 ---
 
