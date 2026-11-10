@@ -73,9 +73,12 @@ MiniGuardian keeps a copy of a file in your protected folders (chosen with
 `sudo mg-setup`; workstation default: Documents, Desktop, Pictures) just
 before it is overwritten. A program that overwrites 50 or more existing files
 there within 5 seconds is **paused** at once (ransomware does exactly that).
-Real package managers and backup tools, root processes, and your terminal
-shell are never paused this way. Tools that legitimately rewrite many files in
-place — whole-project formatters, code generators, some test suites — can be.
+Real package managers and backup tools, and your terminal shell itself, are
+never paused. A root process doing this is paused and held for your decision
+(it appears in the dashboard's approvals); on drone and vehicle profiles it is
+only reported, so the control plane keeps running. Tools that legitimately rewrite many
+files in place — whole-project formatters, code generators, some test suites —
+can be paused.
 
 ```bash
 sudo mg-op ransomware list                 # what was paused, with its pid

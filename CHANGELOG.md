@@ -2,6 +2,11 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-28 — Tue Nov 10 2026
+
+- **The kernel judge is now included, free in the beta.** MiniGuardian runs as root, so on its own it would be the single highest authority on your machine. The kernel judge is an independent copy of its decision engines running in its own small, isolated virtual machine; it must agree with every decision, so taking over root alone is no longer enough to change what MiniGuardian decides. If the judge is missing or disagrees, MiniGuardian stays in its strictest mode. Earlier package installs had no judge, which is why the dashboard showed "judge absent".
+- The judge's virtual machine is locked down: it runs as an unprivileged user inside QEMU's own security sandbox, with no network and no display. QEMU is installed automatically as a dependency (about 30–60 MB if you don't have it).
+
 ## 0.9.1-beta-27 — Sat Nov 07 2026
 
 **Attack immunity: what MiniGuardian stops once, it stops at the first step next time** — after a restart, and when the same thing comes back under a different name or path.
