@@ -16,9 +16,36 @@ Almendarez**, Jayce Automata Research.
 - **Self-protection.** Sealed immutable binaries, a hash manifest, an
   independent antifreeze sentinel, shadow copies of critical files and a
   hash-chained audit log.
+- **Attack immunity.** It acts during an attack and learns from it:
+  - ransomware is paused mid-run and the files are restored;
+  - an attack it stopped once is refused at its first step next time, after
+    a restart and under a new name or path;
+  - every attack it survives makes the machine harder to attack again.
+- **Kernel judge.** An independent copy of the decision engines runs in its
+  own small VM and must agree with every decision, so taking over root alone
+  is not enough to change what MiniGuardian decides.
+- **Supply-chain protection.** Dependencies of plugins and AI sessions are
+  checked against their pinned checksums before anything runs (Rust, Python,
+  Node, git). If a bad package gets in anyway, it has no network of its own
+  and can't quietly send your secrets anywhere.
+- **Controlled internet.** Plugin commands, and AI agents' commands when you
+  opt in, reach the internet only through MiniGuardian's proxy:
+  - one pop-up per new site;
+  - every connection recorded;
+  - programs that go around the proxy have no network.
 - **Jayce kernel engines.** The daemon runs the kernel's engines in-process at
   1 kHz, including the Impossible State Detector, the Predictive Execution
   Horizon and the Self-Healing Causality Mesh, and the dashboard shows them live.
+
+**Tested, not just claimed:**
+- **126 documented security features.**
+- **A 525-scenario red-team campaign:** 525 of 525 passed, all stable.
+- **A decision benchmark:** 170 of 170 correct, before and after the attack
+  traffic.
+- **A live repeat drill:** ransomware, a rootkit, a malicious download and
+  cron persistence were each refused at the first step after a restart.
+
+Details are in the [developer manual](docs/OPEN-PLUGIN-DEVELOPER-MANUAL.md#10-how-secure-is-it-honestly).
 
 **What it does not do:** MiniGuardian raises the cost of an attack and
 constrains AI tools. It cannot stop an attacker who already has root on the
@@ -30,7 +57,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-28)
+## Install the beta (0.9.1-beta-29)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -38,25 +65,25 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-28 && cd ~/miniguard-0.9.1-beta-28
-for f in miniguard_0.9.1-beta-28_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-28/$f
+mkdir -p ~/miniguard-0.9.1-beta-29 && cd ~/miniguard-0.9.1-beta-29
+for f in miniguard_0.9.1-beta-29_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-29/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-28_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-29_amd64.deb
 ```
 
 <!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-28 && cd ~/miniguard-0.9.1-beta-28
-for f in miniguard-0.9.1-28.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-28/$f
+mkdir -p ~/miniguard-0.9.1-beta-29 && cd ~/miniguard-0.9.1-beta-29
+for f in miniguard-0.9.1-29.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-29/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-28.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-29.x86_64.rpm
 ```
 <!-- fedora-install-end -->
 
@@ -76,6 +103,22 @@ Open the dashboard with `sudo miniguard-status` and run an AI tool
 governed with `sudo mg-cli claude` (or `opencode`, and others). Start with the
 [TUI User Guide](docs/TUI_USER_GUIDE.md) and the
 [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md).
+
+## Build with MiniGuardian
+
+- **Plugins in any language.** `mg-plugin new hello --lang python` (or node,
+  rust, apodeixis) creates a plugin that runs inside MiniGuardian's sandbox.
+  It asks for everything it does, and you approve what it may touch at
+  install. AI agents can use installed plugins as tools.
+  - **First plugin:** [Plugin Quickstart](docs/PLUGIN-QUICKSTART.md), about
+    15 minutes.
+  - **Full guide:** [Open Plugin Developer Manual](docs/OPEN-PLUGIN-DEVELOPER-MANUAL.md).
+    It covers what MiniGuardian and the Jayce kernel are, building plugins,
+    adding MiniGuardian to existing projects, OS images and servers,
+    commands, how approvals work, and an honest security summary.
+- **`mg-why -- <command>`** explains why any program failed, in any language.
+  It names the file and line, the cause and the processes involved, with
+  secrets masked. See [Explain a failure](docs/EXPLAIN-A-FAILURE.md).
 
 ### Fedora: blank screen after reboot (beta-5 to beta-10)
 
@@ -138,6 +181,9 @@ sudo systemctl daemon-reload
 - [TUI User Guide](docs/TUI_USER_GUIDE.md), [Error and Recovery Guide](docs/MINIGUARDIAN_ERROR_GUIDE.md)
 - [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md), [Governed Tools Reference](docs/GOVERNED_TOOLS_REFERENCE.md)
 - [Security Features Catalog](docs/SECURITY_FEATURES_CATALOG.md)
+- [Open Plugin Developer Manual](docs/OPEN-PLUGIN-DEVELOPER-MANUAL.md), [Plugin Quickstart](docs/PLUGIN-QUICKSTART.md)
+- [Explain a failure (`mg-why`)](docs/EXPLAIN-A-FAILURE.md), [Write a language file](docs/WRITE-A-LANGUAGE-FILE.md)
+- [Apodeixis language guide](docs/APODEIXIS_LANGUAGE_GUIDE.md), [Jayce 1 kHz tick whitepaper](docs/JAYCE_1000HZ_TICK_WHITEPAPER.md)
 - [Cohost roadmap](docs/ROADMAP_COHOST.md)
 - Papers: [`docs/papers/`](docs/papers/)
 
@@ -151,9 +197,16 @@ refuses military and weapons use classes by design.
 
 ## License
 
-Proprietary. The beta is licensed under the Jayce Automata Research Source
-License v1.0 (see [`LICENSE`](LICENSE)): you may run it for personal
-evaluation. Redistribution, modification and commercial use need written
-permission. Weapons use is never permitted.
+Proprietary, under the Jayce Automata Research Source License v1.1 (see
+[`LICENSE`](LICENSE)). In short:
+- **Run it** for personal use and evaluation.
+- **Ship the official signed packages, unmodified, with your program** or as a
+  dependency of it. This is free for individuals, small organisations and
+  non-commercial programs; larger companies need a commercial licence.
+- **Write plugins:** the open plugin system is open to everyone, and the
+  plugins you write are yours to license and sell.
+- **Changing MiniGuardian itself, or copying its code,** needs written
+  permission.
+- **Weapons use is never permitted.**
 
 Contact: JayceAutomataResearch@proton.me · [www.jayceautomata.com](https://www.jayceautomata.com)

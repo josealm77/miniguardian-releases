@@ -6,8 +6,9 @@
 > (file) that implements each one. Companion to `AGENTS.md`,
 > `docs/archive/security_assessment.md`, `docs/design/AI_WORKSPACE_ENVELOPE_SPEC.md`, and
 > `docs/archive/SELF_LEARNING_ARCHITECTURE.md`.
-> Proprietary — Jayce Automata Research Source License v1.0. View/study/run for
-> personal evaluation only; no redistribution/modification/derivatives.
+> Proprietary — Jayce Automata Research Source License v1.1. View/study/run for
+> personal evaluation; official packages may be shipped unmodified as a
+> dependency (see `LICENSE`); no modification or derivatives.
 
 ---
 

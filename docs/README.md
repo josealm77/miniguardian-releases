@@ -10,6 +10,7 @@ this beta is labelled where it is described.
 - [overview.md](overview.md) — what MiniGuardian is, what is implemented, what is partial.
 - [ROADMAP_COHOST.md](ROADMAP_COHOST.md) — the plan for enforcement beneath the OS (cohost mode), with phases, test criteria and team needs.
 - [MINIGUARDIAN_ONE_PAGE.md](MINIGUARDIAN_ONE_PAGE.md) — one-page summary.
+- [OPEN-PLUGIN-DEVELOPER-MANUAL.md](OPEN-PLUGIN-DEVELOPER-MANUAL.md) — for developers: what MiniGuardian and the Jayce kernel are, building open plugins in any language, TUI/TRust commands, approvals, and an honest security summary.
 - The repository [README](../README.md) (install, build, test) and
   AGENTS.md (full operator and developer notes, design history).
 
@@ -46,5 +47,5 @@ this beta is labelled where it is described.
   Kept for history; **not maintained and not accurate for the current build.**
 
 ## Legal
-- [../LICENSE](../LICENSE) — Jayce Automata Research Source License v1.0 (proprietary).
+- [../LICENSE](../LICENSE) — Jayce Automata Research Source License v1.1 (proprietary; official packages may ship as a dependency, plugins are open for development).
 - [DEVBETA_PARTNER_LICENSE.md](DEVBETA_PARTNER_LICENSE.md) — dev-beta partner terms.

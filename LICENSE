@@ -1,4 +1,6 @@
-# Jayce Automata Research Source License v1.0
+# Jayce Automata Research Source License v1.1
+
+Effective for releases from 0.9.1-beta-29 onward. Earlier releases remain under v1.0.
 
 Copyright (c) 2026 Jose Almendarez / Jayce Automata Research
 All rights reserved.
@@ -21,6 +23,27 @@ develop, test, deploy, or support offensive weapons, autonomous attack systems,
 surveillance infrastructure used to harm individuals, or any system intended to
 cause physical, digital, or psychological harm to persons.
 
+"Official Package" means a release package or binary of the Software exactly as
+published and signed by Jayce Automata Research (for example
+miniguard_<version>_amd64.deb or miniguard-<version>.x86_64.rpm), byte-for-byte
+unmodified, together with its published checksums and signature.
+
+"Dependent Program" means a program, product, operating-system image, server
+image, or service of yours that installs, ships with, or requires an Official
+Package in order to use MiniGuardian's protection.
+
+"Plugin" means a program that runs inside MiniGuardian's open plugin shell and
+communicates with MiniGuardian only through the Plugin Interface.
+
+"Plugin Interface" means the published means of building Plugins: the plugin
+manifest format (mg-plugin.toml), the plugin message protocol, the mg-plugin
+command, the governed tools a Plugin may request, and the starter templates
+created by `mg-plugin new`.
+
+"Small Organization" means an individual, or an organization that, together with
+its affiliates, had less than US$1,000,000 in gross revenue in its last fiscal
+year and fewer than 25 employees and contractors.
+
 GRANT OF RIGHTS
 
 Subject to the terms and conditions of this License, Jayce Automata Research grants you
@@ -28,10 +51,55 @@ a limited, non-exclusive, non-transferable, revocable right to:
 
   1. View and study the Software for personal learning and research.
   2. Run the Software in a personal development or evaluation environment.
+  3. Distribute Official Packages as a dependency of a Dependent Program, as
+     set out in "DEPENDENCY DISTRIBUTION" below.
+  4. Develop, use, and distribute Plugins, as set out in "PLUGINS" below.
 
 No other rights are granted. In particular, you may not fork, modify, or
 create derivative works of the Software except under a separate written
-agreement with Jayce Automata Research.
+agreement with Jayce Automata Research. The Software itself is modified only by
+Jayce Automata Research.
+
+DEPENDENCY DISTRIBUTION
+
+You may distribute Official Packages with a Dependent Program, or have your
+Dependent Program require or install an Official Package (for example as a
+package-manager dependency), on these terms:
+
+  1. UNMODIFIED. Each Official Package is distributed exactly as published,
+     with its published checksums and signature, and is not altered, repacked,
+     re-signed, or partially extracted. You may ship your own configuration
+     files that MiniGuardian reads, provided they do not disable or weaken the
+     protections described in condition (f).
+  2. NOTICES. You include this License with the Official Package, keep all
+     copyright and license notices intact, and state in your Dependent
+     Program's documentation or about screen: "Includes MiniGuardian by Jayce
+     Automata Research, used under the Jayce Automata Research Source License."
+  3. NO ENDORSEMENT. You do not suggest that Jayce Automata Research endorses,
+     sponsors, or certifies your Dependent Program unless it has agreed in
+     writing.
+  4. SIZE LIMIT. Distribution is free of charge for Small Organizations and
+     for non-commercial Dependent Programs. Any other organization that
+     distributes Official Packages with a Dependent Program that is Commercial
+     Use needs a commercial license from Jayce Automata Research first.
+  5. DOWNSTREAM TERMS. Your recipients receive the Official Package under
+     this License, including the weaponization prohibition; you may not offer
+     them different terms for it.
+
+PLUGINS
+
+The open plugin system is open for development by anyone:
+
+  1. You may develop, use, sell, and distribute Plugins you write. A Plugin
+     that interacts with MiniGuardian only through the Plugin Interface is not a
+     derivative work of the Software. You own your Plugin and may license it
+     under any terms you choose.
+  2. You may copy and adapt the starter templates created by `mg-plugin new`
+     into your Plugins without restriction.
+  3. A Plugin must not be designed to bypass, disable, or deceive
+     MiniGuardian's approvals, sandbox, or audit records, and the
+     weaponization prohibition in condition (d) applies to any use of a Plugin
+     with the Software.
 
 CONDITIONS
 
@@ -45,9 +113,10 @@ All exercise of rights granted above must comply with all of the following:
      requires prior written permission from Jayce Automata Research. To request a
      commercial license, contact: <mailto:JayceAutomataResearch@proton.me>
 
-  c. NO REDISTRIBUTION. You may not redistribute, publish, sublicense, sell,
-     or make publicly available the Software or any derivative work without
-     prior written permission from Jayce Automata Research.
+  c. NO REDISTRIBUTION. Except as allowed under "DEPENDENCY DISTRIBUTION"
+     and "PLUGINS", you may not redistribute, publish, sublicense, sell, or
+     make publicly available the Software or any derivative work without prior
+     written permission from Jayce Automata Research.
 
   d. NO WEAPONIZATION. Weaponization of the Software is strictly and
      unconditionally prohibited. This prohibition is non-waivable and cannot
@@ -75,16 +144,18 @@ This includes, without limitation:
 - The right to publish or distribute the Software.
 - The right to use the Jayce or Jayce Automata Research name or logo.
 - The right to make commercial use of the Software.
-- The right to embed the Software in products or services.
+- The right to embed the Software in products or services, except for
+  distributing Official Packages as granted under "DEPENDENCY DISTRIBUTION".
 
 UPDATES AND DISTRIBUTION
 
 Official releases are published at:
 <https://www.jayceautomata.com/releases/>
 
-Only releases signed with the official Jayce Automata Research developer key and
-distributed via the official site are authorized releases. Third-party
-redistribution of release packages is prohibited without written permission.
+Only releases signed with the official Jayce Automata Research developer key are
+authorized releases. Third-party redistribution of release packages is
+prohibited without written permission, except as allowed under "DEPENDENCY
+DISTRIBUTION".
 
 DISCLAIMER OF WARRANTIES
 

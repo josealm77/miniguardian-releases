@@ -59,7 +59,9 @@ When you launch a tool through `mg-cli`, each step can stop the launch:
    the action. If the proof fails, the action does not run.
 4. A **risk score** maps to allow, audit, ask the operator, or block.
 5. A **dependency check** (`mg-supply`) refuses to launch in a workspace with
-   tampered or unpinned dependencies.
+   tampered or unpinned dependencies. It reads Rust, Python (`uv.lock`, hashed
+   `requirements.txt`) and Node (`package-lock.json`) lockfiles; the launch
+   check runs when the workspace has a `Cargo.toml`.
 6. The tool starts inside **Landlock**: it can write only to its workspace and
    `/tmp`, reads outside the workspace are limited to system paths (`/usr`,
    `/etc`, `/proc`, …), and it cannot open TCP connections unless you allow
@@ -180,6 +182,8 @@ example program. One known evasion is recorded in code, in the test
 | `mg-cli` | AI tool governor |
 | `mg-trust-tool`, `mg-mcp-bridge` | Governed tools for scripts and MCP clients |
 | `mg-supply` | Supply-chain check |
+| `mg-why` | Explain why any program failed, in any language ([guide](EXPLAIN-A-FAILURE.md)) |
+| `mg-plugin`, `mg-open-shell` | Build, install and run your own plugins in any language ([quickstart](PLUGIN-QUICKSTART.md)) |
 | `mg-session-hub`, hook bridge | Route tool hooks to the right governed session |
 | `mg-collab`, `mg-chat*` | Multi-editor collaboration and governed chat |
 | `trust_terminal` | Standalone TRust command shell |

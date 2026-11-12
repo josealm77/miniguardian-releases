@@ -43,7 +43,7 @@ The five core "engine" subsystems and their live counters. PEH, ISD and
 SHCM are safety-analysis engines of the Jayce kernel
 (`jayce_kernel_src/src/kernel/engines/`): proprietary code of Jayce
 Automata Research, designed and written by Jose Almendarez, under the Jayce
-Automata Research Source License v1.0 (see `LICENSE`). The daemon runs the
+Automata Research Source License v1.1 (see `LICENSE`). The daemon runs the
 canonical kernel sources through the `jayce_kernel` port.
 
 | Metric | Meaning |

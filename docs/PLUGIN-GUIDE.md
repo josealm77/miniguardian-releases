@@ -1,6 +1,10 @@
 # MiniGuardian Plugins Guide
 
-A reference for the plugins in `plugins/`.
+A reference for the owner-signed plugins in `plugins/`.
+
+> **Writing your own plugin?** You don't need a signing key or daemon code.
+> Use the open plugin shell: **[PLUGIN-QUICKSTART.md](PLUGIN-QUICKSTART.md)**.
+> The one-line protocol below is for owner-signed plugins only.
 
 ## Overview
 

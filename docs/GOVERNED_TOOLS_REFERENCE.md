@@ -102,6 +102,30 @@ sudo mg-cli --curated-dev --deterministic --share-data --workspace ~ /path/to/ai
 
 ---
 
+### Internet from a governed session (`[session_egress]`)
+
+Off by default. With `[session_egress] enabled = true` in
+`/etc/miniguard/miniguard.toml` and `sudo mg-cli`, the agent's commands share
+a private network that holds only loopback and MiniGuardian's proxy:
+
+- **Lookups:** `curl`, `pip`, `npm` and `git` reach the internet through
+  `HTTPS_PROXY`. The first visit to each new site asks the owner once per
+  session (`sudo mg-cli session review`). `extra_hosts` never ask.
+- **Fail closed:** a program that ignores the proxy has no network.
+- **`preview_port {port}`** (asks first): the session's one dev-server port
+  (`[session_egress] dev_port`, default 3000) becomes
+  `http://127.0.0.1:<port>/` on the owner's computer.
+  - The governor holds that port for the whole session.
+  - Connections from other AI sessions are refused.
+  - Output that looks like a secret ends the connection and raises a desktop
+    notice.
+  - Every connection is recorded.
+- **`git push` asks the owner every time.** Use HTTPS remotes with a
+  repo-scoped token. SSH (port 22) is blocked and SSH keys stay hidden.
+- **Records:** every connection is in `mgx` under `-- egress (AI sessions) --`.
+
+The agent process's own connection to its model is unchanged.
+
 ## Human Approval Flow
 
 When a write/exec/delete/system/network tool is invoked, it queues instead of

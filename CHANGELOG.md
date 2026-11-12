@@ -2,6 +2,33 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-29 — Thu Nov 12 2026
+
+**Build your own MiniGuardian plugins, in any language, safely.**
+
+- **Open plugins.**
+  - `mg-plugin new hello --lang python` (or node, rust, apodeixis) creates a plugin that runs inside MiniGuardian's sandbox.
+  - It can't touch your files, the network or other programs directly. It asks, and MiniGuardian checks each request against what you approved at install.
+  - Reads inside approved folders just work; writes, commands and network ask you.
+  - AI agents can use installed plugins as tools.
+  - Start with `docs/PLUGIN-QUICKSTART.md` or the new **Open Plugin Developer Manual**.
+- **`mg-why -- <command>` explains why any program failed,** in any language. It names the file and line, the cause and the processes involved, with secrets masked. It works outside MiniGuardian too, and you can teach it a new language with a small text file.
+- **Internet access through a monitored doorway.**
+  - Plugin commands (`npm install`, `pip`, `cargo build`, your program) reach the internet only through MiniGuardian's proxy. Hosts you approved at install pass; a new site pauses for your OK.
+  - Every connection is listed in `mg-plugin run` output and in `mg-explain`.
+  - Programs that try to go around the proxy have no network at all.
+- **AI agents can look things up (opt-in).** With `[session_egress] enabled = true`:
+  - a governed agent's commands get the same proxy, with one pop-up per new site per session;
+  - one dev-server port for previews, monitored for leaks and for connections from other AI sessions;
+  - every `git push` asks you first.
+- **Confidential data.** Mark folders as confidential. A plugin that reads them, or reads keys or `.env` files, must ask you before sending anything off the machine.
+- **Supply Chain Sentinel v2** checks Python and Node dependencies and git contents, and blocks plugins whose dependencies can't be verified.
+- **Fixed:**
+  - a program running as you could stop the MiniGuardian daemon while a plugin action was running;
+  - plugin commands could not start at all;
+  - the ransomware rule could silently freeze AI agents and builds;
+  - a long approved build no longer holds up every other approval.
+
 ## 0.9.1-beta-28 — Tue Nov 10 2026
 
 - **The kernel judge is now included, free in the beta.** MiniGuardian runs as root, so on its own it would be the single highest authority on your machine. The kernel judge is an independent copy of its decision engines running in its own small, isolated virtual machine; it must agree with every decision, so taking over root alone is no longer enough to change what MiniGuardian decides. If the judge is missing or disagrees, MiniGuardian stays in its strictest mode. Earlier package installs had no judge, which is why the dashboard showed "judge absent".
