@@ -2,6 +2,26 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-30 — Fri Nov 13 2026
+
+**Security update. Please install it.**
+
+- **Security fix.** On beta-29 and earlier, a local program could reach MiniGuardian's built-in tools with root rights through the MCP broker. Every tool call now runs as the user who made it, approvals included, and only that user (or root) can approve it.
+- **Leak guard for AI agents.** Before a governed AI session publishes anything (`git push`, `gh gist create`, `gh release create|upload`, `gh repo create --push`), MiniGuardian reads what would leave:
+  - credentials and secrets files refuse it before you are even asked;
+  - your personal information (your home path, plus anything you list under `[leak_guard] personal`) is flagged on the pop-up.
+  - See `docs/LEAK-GUARD.md`.
+- **Open plugins, hardened.**
+  - Anything a plugin starts ends with the run, even if it detaches.
+  - Rejected or abandoned installs are cleaned up, and at most 5 can wait per user.
+  - A running plugin's files are never removed by a newer version.
+- **Safer installers and helpers.** The opencode and browser installers never work as root inside your home folder. The approval pop-up only ever opens MiniGuardian's own programs.
+- **Cleaner packages.** No build-machine paths inside the binaries, and all known dependency advisories fixed (TLS, QUIC, async runtime).
+- **Fixed:**
+  - the opencode firewall plugin was never installed by the .deb (it showed as inactive in the TUI);
+  - a command that only mentions a push in quotes is no longer stopped;
+  - refused AI-session network limits now cool down after 10 minutes instead of lasting the whole session.
+
 ## 0.9.1-beta-29 — Thu Nov 12 2026
 
 **Build your own MiniGuardian plugins, in any language, safely.**

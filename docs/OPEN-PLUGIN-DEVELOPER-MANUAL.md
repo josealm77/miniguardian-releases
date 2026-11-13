@@ -254,7 +254,10 @@ sudo mg-cli --curated-dev --deterministic --share-data --workspace ~/project cla
     Every connection is monitored and recorded: other AI sessions are
     refused, and output that looks like a secret ends the connection;
   - every `git push` asks first (HTTPS remotes with a repo-scoped token; SSH
-    keys stay hidden).
+    keys stay hidden);
+  - **leak guard:** before you are asked, what a push, gist or release
+    would publish is scanned. Credentials refuse it; your personal
+    information is flagged on the pop-up (`docs/LEAK-GUARD.md`).
 - **Review an agent's session:** `sudo mg-cli session review`.
 
 ---
@@ -538,7 +541,9 @@ earned trust, or a short timed window that the owner opens from the TUI
     byte caps.
   - Approving a big shared CDN host approves more than one site.
 - **Push detection for AI sessions is best effort.** A script can hide a
-  `git push`. The real control is a repo-scoped token you can revoke.
+  `git push`. The real control is a repo-scoped token you can revoke. The
+  leak guard scans the ordinary ways (git, `gh gist`, `gh release`,
+  `gh repo create --push`); it reads text, not binaries.
 - **Kernel features.**
   - Unix-socket blocking needs Landlock `RESOLVE_UNIX`.
   - TCP port rules need Landlock network support (kernel 6.7+).

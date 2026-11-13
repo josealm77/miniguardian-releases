@@ -1153,8 +1153,8 @@ long-press=clear; in-app translation — never TIOCSTI).
   (reads from the socket log ring; needs sudo + socat).
 - **`scripts/build_kernel.sh`** — builds the bare-metal kernel from
   `jayce_kernel_src/`.
-- **SELinux helpers** (`install_selinux_policy.sh`, `fix_selinux_quick.sh` at
-  the repo root) — distro-integration policy installers.
+- **SELinux helpers** (`scripts/selinux/install_selinux_policy.sh`, `fix_selinux_quick.sh`;
+  moved from the repo root in beta-30) — distro-integration policy installers.
 - **`scripts/deploy.sh`** also produces `miniguard-saddle`, `miniguard-status`,
   and bridges; `docker-compose.yml` + `Dockerfile` mount the containerized
   presence (note the threat-model caveats in `docs/archive/security_assessment.md`:
