@@ -28,6 +28,11 @@ Almendarez**, Jayce Automata Research.
   checked against their pinned checksums before anything runs (Rust, Python,
   Node, git). If a bad package gets in anyway, it has no network of its own
   and can't quietly send your secrets anywhere.
+- **Supply-chain scan of the whole machine.** `sudo mg-supply host-scan`
+  checks your projects, installed tools and system packages against public
+  advisory databases, and every system file against what its package
+  installed. It writes a local report with the fix for each finding and
+  never sends anything anywhere.
 - **Controlled internet.** Plugin commands, and AI agents' commands when you
   opt in, reach the internet only through MiniGuardian's proxy:
   - one pop-up per new site;
@@ -57,7 +62,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-30)
+## Install the beta (0.9.1-beta-31)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -65,25 +70,25 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-30 && cd ~/miniguard-0.9.1-beta-30
-for f in miniguard_0.9.1-beta-30_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-30/$f
+mkdir -p ~/miniguard-0.9.1-beta-31 && cd ~/miniguard-0.9.1-beta-31
+for f in miniguard_0.9.1-beta-31_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-31/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-30_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-31_amd64.deb
 ```
 
 <!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-30 && cd ~/miniguard-0.9.1-beta-30
-for f in miniguard-0.9.1-30.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-30/$f
+mkdir -p ~/miniguard-0.9.1-beta-31 && cd ~/miniguard-0.9.1-beta-31
+for f in miniguard-0.9.1-31.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-31/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-30.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-31.x86_64.rpm
 ```
 <!-- fedora-install-end -->
 
@@ -181,6 +186,7 @@ sudo systemctl daemon-reload
 - [TUI User Guide](docs/TUI_USER_GUIDE.md), [Error and Recovery Guide](docs/MINIGUARDIAN_ERROR_GUIDE.md)
 - [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md), [Governed Tools Reference](docs/GOVERNED_TOOLS_REFERENCE.md)
 - [Security Features Catalog](docs/SECURITY_FEATURES_CATALOG.md)
+- [Host supply-chain scan](docs/HOST-SUPPLY-SCAN.md), [Leak guard](docs/LEAK-GUARD.md), [Secure updates](docs/SECURE_UPDATES_GUIDE.md)
 - [Open Plugin Developer Manual](docs/OPEN-PLUGIN-DEVELOPER-MANUAL.md), [Plugin Quickstart](docs/PLUGIN-QUICKSTART.md)
 - [Explain a failure (`mg-why`)](docs/EXPLAIN-A-FAILURE.md), [Write a language file](docs/WRITE-A-LANGUAGE-FILE.md)
 - [Apodeixis language guide](docs/APODEIXIS_LANGUAGE_GUIDE.md), [Jayce 1 kHz tick whitepaper](docs/JAYCE_1000HZ_TICK_WHITEPAPER.md)
@@ -208,5 +214,9 @@ Proprietary, under the Jayce Automata Research Source License v1.1 (see
 - **Changing MiniGuardian itself, or copying its code,** needs written
   permission.
 - **Weapons use is never permitted.**
+
+MiniGuardian is built with open-source components, which keep their own
+licences. Their notices and licence texts ship in every package
+(`/usr/share/doc/miniguard/THIRD_PARTY_NOTICES.md` and `licenses/`).
 
 Contact: JayceAutomataResearch@proton.me · [www.jayceautomata.com](https://www.jayceautomata.com)

@@ -4,6 +4,11 @@
 
 **Astraxis** is a deterministic, mission-verified robotics movement and sensor engine built natively on top of **MiniGuardian**, **Apodeixis**, **Jayce Kernel**, **TRust Terminal**, and **COSMIC Map**.
 
+> **Status in the beta packages:** the Astraxis engine ships as a library
+> inside `trust_terminal` (its commands run in the TRust terminal). The robotics
+> saddle, the console that gates real actuation, is licensed separately and is
+> **not** in the beta packages.
+
 Unlike conventional robotics stacks (such as ROS2 or moveit) that rely on unverified application-layer motion planning and third-party drivers, Astraxis operates at the OS kernel level directly on top of the **Alien Bridge** (kernel hardware interface) and **Raw Signal Engine** (signal normalizer).
 
 ---

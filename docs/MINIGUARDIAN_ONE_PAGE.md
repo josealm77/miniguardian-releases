@@ -1,6 +1,6 @@
 # MiniGuardian — One-Page Summary
 
-*A 30-second read. Full detail in `MINIGUARDIAN_SIMPLIFIED_GUIDE.md`.*
+*A 30-second read. Full detail in [overview.md](overview.md).*
 
 ## What it is
 A **security guard dog** that lives on one Linux machine. It watches everything,
@@ -41,14 +41,14 @@ locks down anything it can't prove safe, and keeps AI agents inside their box.
   *thinking* honest, not just its actions.
 
 ## Tools & governance
-- **29 tools**: 11 read-only (auto-run), 18 that write/exec/delete/mutate/network/ingest
+- **52 tools**: 19 read-only (auto-run), 33 that write/exec/delete/mutate/network/ingest
   (need **human approval**).
 - Every call passes 5 gates: validation → proof check → capability → **human
   gate** → audit log.
 - **mg-cli** wraps any AI tool in a workspace sandbox + supply-chain check.
 - **TRust v2** is the governed command center; its **`mg-trust-tool` CLI** lets
-  AI agents code safely through the same 29 governed tools (11 read-only +
-  18 approval-gated). It also runs rich AI coding via **19 inline language
+  AI agents code safely through the same 52 governed tools (19 read-only +
+  33 approval-gated). It also runs rich AI coding via **19 inline language
   adapters** (Python→Rust→Zig + the Apodeixis proof checker) and a **governed
   shell pipeline** for everyday CLI tools (`grep`, `cat`, ...) — each child
   time- and output-bounded, never `sh -c`.

@@ -1,20 +1,18 @@
 # 🛡️ TRust Smart Terminal — Complete Command Reference Manual
 
-> **Status (measured 2026-09-19).** This manual documents the command catalog inherited
-> from the Jayce SDK's TRust Terminal, which registers 226 commands there. Running each of
-> the 157 catalog names in a sandbox showed: **23 execute natively** in this build, **28 are
-> ordinary host programs** (`ls`, `cat`, `git` and similar, which work when installed),
-> **12 are hyphenated forms of `robot` / `drone` / `swarm` / `vehicle` subcommands** (write
-> them with a space: `robot move`), and **94 are catalogued but not implemented here**. Every
-> one of those 94 has a handler in the SDK's `trust_core` (or, for `drone-waypoint` and
-> `swarm-offload`, is listed in the catalog only); the handlers were not ported. In the
-> terminal, `commands` lists the catalog with these marked `[not available in this build]`,
-> and running one prints a clear message (exit 127) instead of `spawn error`.
-> Per-command table: `docs/reports/claims-audit-2026-09-19/terminal-command-status.tsv`.
-> **Re-checked against the code 2026-09-26:** the catalog and the not-implemented list
-> are unchanged. Rows below carry their status inline.
+> **Status (from the code, 2026-11-13).** This manual documents the command catalog
+> inherited from the Jayce SDK's TRust Terminal, which registers 226 commands there. This
+> build's catalog has **159 names; 67 are catalogued but not implemented here**. The rest
+> execute natively (including the SDK port of November 2026: `ada`, `nlmg`, `pattern`,
+> `curiosity`, `sys-*`, `telemetry`, `timer`, `note`, `todo`, `focus`, `scaffold`, `build`,
+> `check`), are ordinary host programs (`ls`, `cat`, `git` and similar, which work when
+> installed), or are hyphenated forms of `robot` / `drone` / `swarm` / `vehicle`
+> subcommands (write them with a space: `robot move`). In the terminal, `commands` lists
+> the catalog with the unavailable ones marked `[not available in this build]`, and running
+> one prints a clear message (exit 127) instead of `spawn error`. Rows below carry their
+> status inline.
 
-*Jayce Microkernel, IronPilot Robotics & MiniGuardian Security Substrate v0.9.0-beta*
+*Jayce Microkernel, IronPilot Robotics & MiniGuardian Security Substrate v0.9.1-beta*
 
 ---
 
@@ -38,7 +36,7 @@
 
 ## 1. MiniGuardian Local Security & Forensics
 
-These commands run locally inside `trust-terminal` and directly interface with the sealed `miniguard` daemon over `/run/jayce-operator/miniguard.sock`.
+These commands run locally inside `trust_terminal` and directly interface with the sealed `miniguard` daemon over `/run/jayce-operator/miniguard.sock`.
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
@@ -165,11 +163,11 @@ Interface with ADA (Autonomous Deterministic Agent) and cognitive memory structu
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| **`ada`** | `ada <status\|query>` | Query and control ADA's cognitive state directly from TRust. **[not available in this build]** |
-| **`nlmg`** | `nlmg <inspect\|query>` | Manipulate the Natural Language Memory Graph (NLMG). **[not available in this build]** |
-| **`pattern`** | `pattern <list\|clear>` | Cognitive pattern memory inspection and management. **[not available in this build]** |
+| **`ada`** | `ada <status\|query>` | Query and control ADA's cognitive state directly from TRust. |
+| **`nlmg`** | `nlmg <inspect\|query>` | Manipulate the Natural Language Memory Graph (NLMG). |
+| **`pattern`** | `pattern <list\|clear>` | Cognitive pattern memory inspection and management. |
 | **`drive`** | `drive` | Drive vector control and internal goal alignment. **[not available in this build]** |
-| **`curiosity`** | `curiosity` | Control the curiosity exploration engine. **[not available in this build]** |
+| **`curiosity`** | `curiosity` | Control the curiosity exploration engine. |
 | **`hypersearch`** | `hypersearch <query>` | Execute semantic hypersearch across indexed codebases and docs. **[not available in this build]** |
 
 ---
@@ -181,7 +179,7 @@ Interface with ADA (Autonomous Deterministic Agent) and cognitive memory structu
 | **`illusion`** | `illusion` | Control the Deception Stack and inspect intercepted MITRE probes. |
 | **`chauffeur`** | `chauffeur` | Chauffeur inter-process message router control and isolation. **[not available in this build]** |
 | **`shim`** | `shim` | Inspect ABI boundary isolation shims and capability denials. **[not available in this build]** |
-| **`trust`** | `trust` | Boot Trust Engine posture and mode tuning. |
+| **`trust`** | `trust` | Boot Trust Engine posture and mode tuning. **[not available in this build]** |
 | **`sec`** | `sec` | Inspect security posture, run self-tests, and tune trust modes. **[not available in this build]** |
 | **`boot`** | `boot` | Scaffold and validate boot-safe release projects and Secure Boot flow. **[not available in this build]** |
 
@@ -208,9 +206,9 @@ Interface with ADA (Autonomous Deterministic Agent) and cognitive memory structu
 | **`jvc`** | `jvc <pack\|unpack> <file>` | Deterministic JVC binary compressor and decompressor tool. |
 | **`code`** | `code <prompt>` | Code generation pipeline. |
 | **`patch`** | `patch` | Automated code patch pipeline control. |
-| **`scaffold`** | `scaffold <template>` | Scaffolds new projects with microkernel-safe templates. **[not available in this build]** |
-| **`build`** | `build` | Compiles workspace or Observatory SDK target artifacts. **[not available in this build]** |
-| **`check`** | `check` | Runs `cargo check` in the current workspace. **[not available in this build]** |
+| **`scaffold`** | `scaffold <template>` | Scaffolds new projects with microkernel-safe templates. |
+| **`build`** | `build` | Runs `cargo build` in the current workspace and summarises any fixes it suggests. |
+| **`check`** | `check` | Runs `cargo check` in the current workspace and summarises any fixes it suggests. |
 | **`test`** | `test` | Runs `cargo test` in the current workspace. |
 
 ---
@@ -244,12 +242,12 @@ Interface with ADA (Autonomous Deterministic Agent) and cognitive memory structu
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| **`sys-info`** | `sys-info` | Display TRust version, substrate release, and host OS metadata. **[not available in this build]** |
-| **`sys-mem`** | `sys-mem` | Detailed memory utilization breakdown. **[not available in this build]** |
-| **`sys-cpu`** | `sys-cpu` | CPU model, topology, and core load distribution. **[not available in this build]** |
+| **`sys-info`** | `sys-info` | Display TRust version, substrate release, and host OS metadata. |
+| **`sys-mem`** | `sys-mem` | Detailed memory utilization breakdown. |
+| **`sys-cpu`** | `sys-cpu` | CPU model, topology, and core load distribution. |
 | **`peace`** | `peace` | Run Peace Audit engine self-test. **[not available in this build]** |
 | **`watchdog`** | `watchdog` | Query watchdog safety timers. **[not available in this build]** |
-| **`telemetry`** | `telemetry` | Display telemetry subsystem metrics. **[not available in this build]** |
+| **`telemetry`** | `telemetry` | Display telemetry subsystem metrics. |
 
 ---
 
@@ -261,10 +259,10 @@ Interface with ADA (Autonomous Deterministic Agent) and cognitive memory structu
 | **`ask`** | `ask <question>` | Ask the terminal an advisory question. **[not available in this build]** |
 | **`history`** | `history` | Display interactive shell command history. **[not available in this build]** |
 | **`alias`** | `alias [name=cmd]` | Define or list shell command aliases. **[not available in this build]** |
-| **`timer`** | `timer <secs>` | Set a session or kernel timer. **[not available in this build]** |
-| **`note`** | `note <text>` | Add a developer session note. **[not available in this build]** |
-| **`todo`** | `todo` | View and manage your workspace todo list. **[not available in this build]** |
-| **`focus`** | `focus` | Track focus and active developer workflow time. **[not available in this build]** |
+| **`timer`** | `timer <secs>` | Set a session or kernel timer. |
+| **`note`** | `note <text>` | Add a developer session note. |
+| **`todo`** | `todo` | View and manage your workspace todo list. |
+| **`focus`** | `focus` | Track focus and active developer workflow time. |
 
 ---
 

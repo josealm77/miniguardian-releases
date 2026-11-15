@@ -40,9 +40,9 @@ one command that verifies a fix); `fixes` lists past summaries.
 | TUI Output / Error Message | Root Cause | Resolution |
 | :--- | :--- | :--- |
 | `threat_level: disconnected` | The `miniguard` daemon process is not running or the socket `/run/jayce-operator/miniguard.sock` is inactive. | Start the daemon: `sudo systemctl start miniguard` or `sudo miniguard --foreground`. |
-| `Permission denied (os error 13)` | `trust-terminal` or `miniguard-status` was executed without `sudo`. Token `/run/jayce-operator/miniguard.sock.token` is `0600 root-only`. | Always run TUI tools with `sudo`: `sudo trust-terminal`. |
-| `seal: unknown` | 1. Daemon has just booted (first 120s tick pending).<br>2. `/etc/miniguard/seal.hashes` is missing. | Run `sudo bash scripts/deploy.sh` to update hashes and restart. |
-| `seal: mismatch` | Binary hash drift: `/usr/local/bin/miniguard` or `/usr/local/bin/miniguard-sentinel` hash does not match `/etc/miniguard/seal.hashes`. | Re-deploy official binaries: `sudo bash scripts/deploy.sh`. |
+| `Permission denied (os error 13)` | `trust_terminal` or `miniguard-status` was executed without `sudo`. Token `/run/jayce-operator/miniguard.sock.token` is `0600 root-only`. | Always run TUI tools with `sudo`: `sudo trust_terminal`. |
+| `seal: unknown` | 1. Daemon has just booted (first 120s tick pending).<br>2. `/etc/miniguard/seal.hashes` is missing. | Wait two minutes after boot; if it stays `unknown`, run `sudo mg-seal --installed` (source builds: `sudo bash scripts/seal.sh`). |
+| `seal: mismatch` | Binary hash drift: `/usr/local/bin/miniguard` or `/usr/local/bin/miniguard-sentinel` hash does not match `/etc/miniguard/seal.hashes`. | Reinstall the official package (`sudo apt install --reinstall ./miniguard_<version>_amd64.deb`, or `sudo dnf reinstall ./miniguard-<version>.x86_64.rpm`), then `sudo mg-seal --installed`. |
 | `failed to bind port 19876: Address in use` | Another instance of `miniguard` is already running in background. | Stop existing service first (`sudo systemctl stop miniguard`) or run status query instead of launching second daemon. |
 
 ---
@@ -136,14 +136,15 @@ it was loading, and the crash lines from the journal.
 
 ```bash
 # 1. Clear TUI Audit Feed & Telemetry Counters:
-# Inside 'sudo trust-terminal', press key 'c' or 'r'
+# Inside 'sudo miniguard-status', press key 'c' or 'r'
 
-# 2. Re-Deploy Hardened Binaries & Re-Seal Hashes:
-sudo bash scripts/deploy.sh
+# 2. Re-Seal Installed Binaries & Hashes (package install):
+sudo mg-seal --installed
+#    (from a source build: sudo bash scripts/seal.sh)
 
 # 3. Dump Full Forensic Log for Diagnostic Ingestion:
-sudo trust-terminal
-trust@MiniGuardian$ forensic json
+sudo trust_terminal
+trust@MiniGuardian$ forensic --json
 
 # 4. Check Kernel & Service Watchdog Status:
 sudo systemctl status miniguard

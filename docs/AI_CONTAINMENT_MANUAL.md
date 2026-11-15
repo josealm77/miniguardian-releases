@@ -1,6 +1,6 @@
 # AI Containment Manual
 
-*MiniGuardian v0.9.0-beta — Recursive AI Security Architecture*
+*MiniGuardian v0.9.1-beta — Recursive AI Security Architecture*
 
 ---
 
@@ -9,7 +9,7 @@
 This document describes MiniGuardian's AI containment subsystem: how the system identifies, monitors, deceives, and contains artificial intelligence of any type — from local LLMs to autonomous agents, embodied robots, neuromorphic hardware, theoretical AGI, and custom intelligences such as Iron Pilot.
 
 > **Implementation scope note:** The four-layer pipeline below describes the full
-> containment architecture. As of v0.9.0-beta, the **AI containment envelope**
+> containment architecture. As of v0.9.1-beta, the **AI containment envelope**
 > (`ai_envelope.rs`) is **detection-only (Phase 0)**: it tags and monitors AI
 > processes but does **not** write cgroups, enforce per-tag network egress
 > allowlists, or intercept GUI exec via seccomp-notify/eBPF. Active containment
@@ -18,7 +18,7 @@ This document describes MiniGuardian's AI containment subsystem: how the system 
 > **eBPF enforcer** (execve/memfd/connect hooks in Hostile/Paranoid posture).
 > The deferred features (cgroup tag moves, per-tag egress, GUI exec
 > interception) are behind kill switches, default off, and documented in
-> `AIE_IMPLEMENTATION_RISK.md`. This manual describes the target architecture;
+> the internal AIE risk analysis. This manual describes the target architecture;
 > where a layer is not yet wired, it is noted inline.
 
 It covers:
@@ -321,7 +321,7 @@ For example, AGI defaults to:
 
 ## 5. Terminal Commands
 
-The following commands run locally inside `trust-terminal` and exercise the AI containment subsystem. They do not require root unless noted.
+The following commands run locally inside `trust_terminal` and exercise the AI containment subsystem. They do not require root unless noted.
 
 | Command | Usage | Description |
 |---------|-------|-------------|
@@ -553,13 +553,20 @@ The AI containment subsystem must never be bypassed. The following rules are non
 - Custom AI types must declare at least one kill switch.
 - The daemon must remain sandboxed; the envelope cannot be used to relax Landlock/seccomp rules.
 - All containment policy changes are logged and reversible from sealed backups.
-- Telemetry to the J.A.R. master console is immunization-only: no user data, prompts, files, or PII are uploaded.
+- Telemetry to the J.A.R. Master Console (planned, §12) will be immunization-only: no user data, prompts, files, or PII.
 
 ---
 
 ## 12. J.A.R. Master Console and Fleet-Wide AI Containment
 
-The Jayce Automata Research (J.A.R.) Master Console is the fleet-wide coordination surface for all MiniGuardian instances. It is hosted on the J.A.R. website and serves as the central hub through which distributed nodes share attack intelligence and receive immunization updates.
+> **Status: planned.** A console prototype exists as a separate project, but
+> it is not released and no hosted Master Console is available yet; this
+> section describes its design. What ships today is the node side: a
+> MiniGuardian node can verify and apply signed immunity rules (the `[fleet]`
+> section below, off by default), and nodes can exchange them with each other
+> over the authenticated gossip transport. Nothing is uploaded anywhere.
+
+The Jayce Automata Research (J.A.R.) Master Console is the planned fleet-wide coordination surface for MiniGuardian instances: a hub, to be hosted by J.A.R., through which distributed nodes would share attack intelligence and receive immunization updates.
 
 ### 12.1 What the Master Console Is
 
@@ -583,7 +590,7 @@ All uploads are:
 
 - **Zero PII** — no usernames, hostnames, file paths, or conversation content.
 - **Hashed / fingerprinted** — raw payloads are reduced to entropy signatures and behavior graphs.
-- **Optional** — linking to the Master Console is controlled by the `[cloud_brain]` token in `miniguard.toml`. Without it, the node runs fully offline.
+- **Optional** — a node only ever acts on fleet rules when `[fleet] enabled = true`; by default it runs fully offline.
 
 ### 12.3 Global Swarm Immunity
 
@@ -599,33 +606,30 @@ When one MiniGuardian node blocks a novel AI escape attempt, the sequence is:
 
 The result is **swarm immunity**: a new AI escape technique blocked on one node can be neutralized across the entire fleet before it reaches other nodes.
 
-### 12.4 Linking a Node to the Master Console
+### 12.4 Accepting Signed Fleet Rules on a Node
 
-In `miniguard.toml`:
+In `miniguard.toml` (shipped off):
 
 ```toml
-[cloud_brain]
+[fleet]
 enabled = true
-token = "<your-jar-api-token>"
-endpoint = "https://console.jayceautomata.research/v1"
+# Ed25519 verifying keys (64 hex characters) allowed to sign immunity rules.
+# Empty = every rule is refused (fail-closed).
+trusted_keys = ["<64-hex verifying key>"]
 ```
 
-To run offline:
-
-```toml
-[cloud_brain]
-enabled = false
-```
+To stay offline, leave `[fleet] enabled = false` (the default). Linking to the
+hosted console is not available yet.
 
 ### 12.5 Console Replication and Reliability
 
-For production fleets, the Master Console can be deployed as a replicated cluster (3 or 5 nodes) with one active leader. Nodes dial a stable address (VIP or DNS `console.fleet`) that always fronts the current leader. If a leader fails, a standby takes over without re-blinding the fleet:
+As designed, the Master Console can be deployed as a replicated cluster (3 or 5 nodes) with one active leader. Nodes dial a stable address (VIP or DNS `console.fleet`) that always fronts the current leader. If a leader fails, a standby takes over without re-blinding the fleet:
 
 - Already-acked rules are not re-applied.
 - Quarantine and auth-failure state survives failover.
 - Console-to-console replication reuses the existing mTLS + HMAC gossip transport.
 
-See `docs/design/master_console_replication_spec.md` for the full replication design.
+The full replication design is internal (not published).
 
 ### 12.6 What the Console Is Not
 
@@ -641,7 +645,11 @@ It only pushes **immunization hardening** — never relaxation — and every pus
 
 ## 13. Redeploying and Updating MiniGuardian
 
-After changing the containment code, rebuild and re-seal the daemon and status binary.
+**Package installs** (`.deb` / `.rpm`) are updated by installing the newer
+package; to re-pin and re-seal what is installed, run `sudo mg-seal --installed`
+(add `--mount-ro` for a read-only `/usr/local/bin`). The steps below are for
+**source builds** (partners and reviewers with source access): after changing
+the containment code, rebuild and re-seal the daemon and status binary.
 
 ### 13.1 Full re-seal (recommended)
 
@@ -1176,11 +1184,9 @@ list: see the [Governed Tools Reference](GOVERNED_TOOLS_REFERENCE.md).
 
 ## 15. See Also
 
-- `docs/archive/AI_CONTAINMENT_PIPELINE_ESSAY.md` — architectural essay
-- `docs/design/AIE_IMPLEMENTATION_RISK.md` — phased rollout risk analysis
-- `docs/design/IDENTITY_FIREWALL_SHADOW_TEST_PLAN.md` — UID-scoped identity firewall shadow-test procedure
-- `docs/design/AI_WORKSPACE_ENVELOPE_SPEC.md` — workspace envelope specification
-- `docs/archive/SELF_LEARNING_ARCHITECTURE.md` — self-learning and swarm immunity architecture
-- `docs/design/master_console_replication_spec.md` — master console cluster replication design
+- Internal design documents (not published; reviewers and partners can ask
+  for them): the containment pipeline essay, the rollout risk analysis, the
+  identity-firewall shadow-test plan, the workspace envelope specification,
+  the self-learning architecture and the Master Console replication design.
 - `docs/TRUST_COMMAND_MANUAL.md` — full TRust terminal command reference
 - `docs/SECURITY_FEATURES_CATALOG.md` — broader security feature catalog

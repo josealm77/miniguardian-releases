@@ -11,8 +11,7 @@ this beta is labelled where it is described.
 - [ROADMAP_COHOST.md](ROADMAP_COHOST.md) — the plan for enforcement beneath the OS (cohost mode), with phases, test criteria and team needs.
 - [MINIGUARDIAN_ONE_PAGE.md](MINIGUARDIAN_ONE_PAGE.md) — one-page summary.
 - [OPEN-PLUGIN-DEVELOPER-MANUAL.md](OPEN-PLUGIN-DEVELOPER-MANUAL.md) — for developers: what MiniGuardian and the Jayce kernel are, building open plugins in any language, TUI/TRust commands, approvals, and an honest security summary.
-- The repository [README](../README.md) (install, build, test) and
-  AGENTS.md (full operator and developer notes, design history).
+- The repository [README](../README.md): install, verify, uninstall.
 
 ## Using it
 | Document | What it covers |
@@ -26,7 +25,7 @@ this beta is labelled where it is described.
 | Document | What it covers |
 |---|---|
 | [AI_CONTAINMENT_MANUAL.md](AI_CONTAINMENT_MANUAL.md) | How governed AI sessions are contained |
-| [GOVERNED_TOOLS_REFERENCE.md](GOVERNED_TOOLS_REFERENCE.md) | The 29 governed tools, the human approval flow, the MCP bridge |
+| [GOVERNED_TOOLS_REFERENCE.md](GOVERNED_TOOLS_REFERENCE.md) | The 52 governed tools, the human approval flow, the MCP bridge |
 | [PLUGIN-GUIDE.md](PLUGIN-GUIDE.md) | Signed, sandboxed plugins |
 
 ## Security and internals

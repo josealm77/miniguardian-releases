@@ -139,14 +139,25 @@ Preview: ...
 
 A human then decides, out of band — never the agent:
 
-- **Desktop pop-up.** The logged-in user gets a notification; clicking it (or
-  its **Review** button, where the desktop shows buttons) opens a terminal
-  running `sudo -k miniguard-status --approvals` — one screen for daemon calls,
-  unregistered tools and every `mg-cli` session's queue, password asked every
-  time. The notification itself approves nothing, so a forged click cannot
-  approve. On a notification server without click support the notification
-  text says which command to run. Pop-ups are coalesced (one per review
-  target at most every 2 minutes).
+- **Desktop pop-up.** The logged-in user gets a notification with
+  **Approve**, **Deny** and **Review** (on desktops that draw no notification
+  buttons, such as COSMIC, clicking it opens a small dialog with the same
+  choices):
+  - for an `mg-cli` session's item, Approve / Deny run
+    `pkexec mg-cli session approve|reject <id>`: your password decides, so a
+    forged click can only raise the password prompt. A group of file actions
+    also offers **Approve all**;
+  - for a governed tool call waiting in the daemon, Approve / Deny resolve
+    that one queued call directly, without a password. Only root or a desktop
+    user's own processes may answer; a governed AI session and anything the
+    daemon started (plugins) are refused;
+  - **Review** opens a terminal running `sudo -k miniguard-status --approvals`:
+    one screen for daemon calls, unregistered tools and every session's queue.
+
+  From beta-31, a pop-up whose item was already decided (in the TUI or another
+  pop-up) says so and asks no password. On a notification server without
+  click support the notification text says which command to run. Pop-ups are
+  coalesced (one per review target at most every 2 minutes).
 - **TUI.** `sudo miniguard-status`, press `t` (Tool Approvals): `↑`/`↓` select,
   `Enter` approve, `x` reject. Governed tool calls are listed as `call`.
 - **Auth socket** (token first line):
@@ -211,7 +222,7 @@ whose literal *or symlink-resolved* form is sensitive — shell rc files, `.ssh`
 `/root`, `/run`, MiniGuardian's own state, and similar. Deletes and moves are
 only ever approved by an explicit rule.
 
-## Complete Tool List (51 Tools)
+## Complete Tool List (52 Tools)
 
 > **Ported from the Jayce SDK.** The TRust Smart Terminal was vendored from the SDK's
 > `trust_core` into the `trust_terminal` crate, and the governed-tool layer was
@@ -224,10 +235,11 @@ only ever approved by an explicit rule.
 > plain substring replacement, `structured_insert` replaced an unparseable JSON file
 > with `{}`, `governed_run` claimed network/CPU/file isolation it never set up, and
 > `governed_fs_action` deleted every empty file in a folder as "unused assets";
-> `safe_replace` duplicates `doc_regex_replace`. The 51 tools below are what this
-> build offers.
+> `safe_replace` duplicates `doc_regex_replace`. The 52 tools below are what this
+> build offers (19 read-only, 33 approval-gated; counted from the registry
+> 2026-11-13).
 
-### Read-Only Tools (17) — Auto-approve, still audited
+### Read-Only Tools (18) — Auto-approve, still audited
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
@@ -248,6 +260,7 @@ only ever approved by an explicit rule.
 | `clipboard_read` | Read the desktop clipboard | *(no parameters)* |
 | `memory_search` | Semantic search over the `mg-mem` knowledge graph | `query` (required), `top_k` (optional, default 5) |
 | `memory_recall` | List or search memories by tag | `tag` (optional), `limit` (optional, default 20) |
+| `calc` | Evaluate an arithmetic or geometry expression | `op` (required: `add`, `sub`, `mul`, `div`, `mod`, `pow`, `max`, `min`, `sqrt`, area/perimeter/volume ops …), `a`, `b`, `w`, … (optional operands) |
 
 ### Write Tools (10) — Require human approval
 
@@ -494,7 +507,7 @@ Architecture: `MCP client ──STDIO(MCP JSON-RPC)──> mg-mcp-bridge ──A
 
 ## Files
 
-- `trust_terminal/src/terminal/smart_terminal/tool_system.rs` — ToolRegistry core, 29 of the 31 tools (the other 2 in `action_tools.rs`), missions, audit
+- `trust_terminal/src/terminal/smart_terminal/tool_system.rs` — ToolRegistry core, missions, audit; the 52 tools are defined there, in `expanded_tools.rs` and in `action_tools.rs`
 - `miniguard/src/bin/mg_trust_tool.rs` — CLI access to the tool system via daemon socket
 - `miniguard/src/bin/mg_mcp_bridge.rs` — MCP bridge for any MCP-capable client
 - `miniguard/src/approval_prompt.rs` + `scripts/mg-approval-prompt.sh` — desktop Review pop-up

@@ -12,6 +12,12 @@ Signed, proof-checked over-the-air updates for sealed MiniGuardian deployments.
 
 Updates are **disabled by default**. Nothing happens until you configure `[updates]`.
 
+> **Status:** the update machinery ships in the daemon, but Jayce Automata
+> Research does not run a public update channel yet. Beta releases are
+> published as signed `.deb` / `.rpm` packages on GitHub; install the newer
+> package to update. The channel URL below is an example for operators who
+> host their own signed channel.
+
 ---
 
 ## 1. Enable updates on the host
@@ -209,7 +215,6 @@ Restores the most recent backup pair and restarts services.
 - `miniguard/src/update_manager.rs` — core logic, Apodeixis policy, signature/hash verification.
 - `miniguard/src/socket_server.rs` — `update status|check|apply|rollback` commands.
 - `miniguard/src/config.rs` — `[updates]` config section.
-- `AGENTS.md` — terse reference.
 
 ---
 

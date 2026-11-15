@@ -293,6 +293,22 @@ tool has behaved across sessions and what autonomy it has earned. An agent
 appears after its first governed `mg-cli` session. Pressing `e` again
 refreshes the list.
 
+**AI Constitution box (top).** Each AI agent's privilege level, worst first:
+Normal, Restricted, Minor, Major, Severe or Solitary. It also shows the
+agent's violation count. An agent in **Solitary** confinement cannot be
+launched at all.
+
+To bail an agent out:
+1. **`Tab`** selects the agent.
+2. **`b`** shows what will happen ("Bail ai-claude from Solitary to Severe?").
+3. **`b`** again confirms it. **`Esc`** cancels instead.
+
+Each bail raises the agent **one level only**, so a full pardon from Solitary
+takes five bails. It uses the owner-only `ai_constitution_override` command on
+the root management socket, which a governed AI cannot reach. Every override
+is recorded in the audit chain as "operator override: AI Constitution level
+X → Y". Good behaviour also restores levels on its own over time.
+
 **List view** — one row per agent: `AGENT`, `SESS` (total sessions), `ACTS`
 (total actions), `BLK` (total blocked), `LEARN%` (learning score; green above
 90%, yellow above 70%), `CLEAN` (consecutive clean actions), `CAPS`
@@ -448,7 +464,7 @@ The title says where the frames came from:
 
 | Title | Source | Trust |
 |---|---|---|
-| `daemon coprocessor` | frames the daemon's kernel VM forwards over the socket (`kernel_vm`) | verified path (not yet forwarded by the daemon — see AGENTS.md) |
+| `daemon coprocessor` | frames the daemon's kernel VM forwards over the socket (`kernel_vm`) | verified path (not yet forwarded by the daemon) |
 | `serial log — UNVERIFIED, display only` | a log file written by a QEMU window | anyone who can write the file can forge frames; monitoring only, never evidence |
 | `STALE — frames stopped` | no frame for 5 s (kernel paused/exited/log gone) | — |
 
@@ -498,7 +514,8 @@ Pressing `space` acknowledges and dismisses it.
 | `↑` / `↓` | scroll the focused feed panel (main page) |
 | `↑` / `↓`, `Enter` | select an agent / open its detail (Developmental page) |
 | `r` | reset the selected agent to baseline (Developmental detail view only) |
-| `↑` / `↓`, `Enter`, `x`, `s`, `w` | select / approve / reject / approve-global (`xN` only) / timed auto-approve window (Tool Approvals page) |
+| `Tab`, then `b` twice | select an agent in the AI Constitution box, then raise it one privilege level (first `b` asks, second confirms; `Esc` cancels) (Developmental page) |
+| `↑` / `↓`, `Enter`, `x`, `o`, `s`, `w` | select / approve / reject / expand-collapse a group / approve-global (`xN` only) / timed auto-approve window (Tool Approvals page) |
 | `space` | acknowledge the Authority Required modal |
 | `d` | mute/unmute the authority-modal terminal ding |
 | (resize) | immediate redraw / layout reflow |
@@ -532,3 +549,4 @@ genuinely ongoing, the feed repopulates — that's by design, not a bug.
 | `--kernel-log <path>` | kernel serial log shown (unverified, display-only) as "kernel vitals" on the `k` page; default `$JAYCE_KERNEL_SERIAL_LOG`, else `/tmp/jayce-kernel-serial.log` |
 | `--socket <path>` | socket path (default `/run/jayce-operator/miniguard.sock`) |
 | `--compare`, `--assess`, `--products` | non-TUI text modes (stdout), not windows |
+| `--govern <pid> --expect <tool>` | restart one ungoverned AI process under governance and exit (root; what the desktop "run governed?" pop-up runs, through pkexec) |

@@ -1,8 +1,9 @@
 # MiniGuardian — Overview
 
-*Status as of 2026-09-19, re-checked against the source 2026-09-26. The
-2026-09-19 evidence is in
-`docs/reports/claims-audit-2026-09-19/claims-audit-frontdoor.tsv`. Numbers carry
+*Status as of 2026-09-19, re-checked against the source 2026-09-26 and
+2026-11-13 (beta-31). The
+2026-09-19 evidence is in an internal claims-audit report (not published;
+reviewers can ask for it). Numbers carry
 the date they were measured.*
 
 ## What it is
@@ -31,17 +32,24 @@ the kernel can also run on its own in QEMU.
 | Antifreeze sentinel | Separate process that un-freezes a stopped daemon (SIGCONT) and restarts it after repeated freezes | Implemented |
 | Sealing | Immutable binaries and a hash manifest, re-checked about every 2 minutes | Implemented |
 | `mg-cli` governor | Runs an AI tool under Landlock: file sandbox plus **default-deny TCP** (kernel 6.7+), a proof-checked action gate, a fake-response layer for escape attempts, a dependency check before launch, and (under sudo, CLI tools) no access to the desktop: X server, session D-Bus and Wayland sockets are hidden so the agent cannot fake pointer or keyboard input | Implemented (desktop isolation added 2026-09-26) |
-| Human approval | Queued actions (tool calls, unregistered tools, risky file actions) raise a desktop pop-up whose only button, **Review**, opens a password-protected approval terminal; approval always needs sudo | Implemented 2026-09-26, **not yet verified on a live desktop** |
-| Governed tools | 29 built-in tools; reading is automatic, writing, running, deleting, network and memory ingest wait for human approval | Implemented |
+| Human approval | Queued actions (tool calls, unregistered tools, risky file actions) raise a desktop pop-up with **Approve**, **Deny** and **Review**; approving a session's file action asks for your password (pkexec), and the TUI's approvals page decides the same queue. From beta-31 a pop-up whose item was already decided asks no password | Implemented, in daily use |
+| Governed tools | 52 built-in tools; reading is automatic, writing, running, deleting, network and memory ingest wait for human approval | Implemented |
 | Content scanners | Prompt-injection guard, memory-poisoning scanner, tool-call gate, exposed on a read-only local socket | Implemented (see limits) |
 | Identity firewall | UID-scoped UDP policy for the governed account | Implemented, **off by default** (shadow mode first) |
 | AI envelope (tagging, per-tool egress, GUI exec interception) | Detects AI tools and tags them | **Detection only**; the enforcement parts are planned |
 | Jayce kernel | 44 deterministic engines, boots in QEMU from `artifacts/kernel/jayce-kernel.iso` | Implemented as source and a QEMU image |
-| Kernel as a "judge" | The daemon launches the kernel in QEMU and cross-checks it | **Partial**: optional, off on this host, and cannot start under the shipped systemd unit (see Limits) |
+| Kernel as a "judge" | The daemon launches the kernel in QEMU (as `nobody`, seccomp, no network) and every decision must agree with it | Implemented; on in the shipped config (`[kernel_vm] judge_mode = "strict"`) |
 | Kernel vitals in the TUI | Live kernel counters on the `k` page of `miniguard-status` | Implemented; read from a serial log and marked unverified |
-| TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 94 of the 157 catalogued commands are not implemented here, and are marked as such (see below). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands |
+| TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 67 of the 159 catalogued commands are not implemented here, and are marked as such (see below; counted from the code 2026-11-13). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands |
 | Cosmic Map | 2D fleet observatory | **Not available in this beta**: `miniguard --map` prints a "not available" message; the `cosmic_map` crate still builds a standalone binary that is not installed |
-| Master Console, fleet intelligence, swarm immunity | Cross-host dashboard, rule distribution, shared attack signatures | **Future plan.** Nothing is deployed (hosting needs paid infrastructure). A console prototype exists as a separate project outside this repo; the daemon has no client for it |
+| Attack immunity | Every contained attack is remembered and refused at its first step next time, after a restart and under a new name or path (`sudo mg-op immunity list`) | Implemented (beta-27) |
+| Download guard | Executable downloads are quarantined until you release them | Implemented |
+| Open plugins | Plugins in any language in a sandbox; every action checked against what you approved at install (`mg-plugin`) | Implemented (beta-29) |
+| Egress proxy | Plugin commands (and, opt-in, AI sessions) reach the internet only through MiniGuardian's proxy; new sites ask | Implemented (beta-29) |
+| `mg-why` | Explains why a program failed, in any language, secrets masked | Implemented (beta-29) |
+| Leak guard | Before a governed AI session publishes, credentials are refused and personal information is flagged | Implemented (beta-30) |
+| Host supply-chain scan | `sudo mg-supply host-scan`: projects, tools and system packages against public advisories; system files against their packages; local report only | Implemented (beta-31) |
+| Master Console, fleet intelligence, swarm immunity | Cross-host dashboard, rule distribution, shared attack signatures | **Future plan.** Nothing is deployed (hosting needs paid infrastructure). A console prototype exists as a separate project outside this repo. The daemon can verify signed fleet rules (`[fleet]`, off by default) but has no console client |
 | Bare-metal OS installer | Boot the kernel as the operating system | **Not shipped**: the installer script is a stub |
 | Windows / macOS | | Not supported (Linux only) |
 
@@ -124,14 +132,14 @@ records why; it may have been deliberate hardening.
 (`trust_cli`) over `trust_core`, which holds the parser, a capability-checked registry and
 226 registered command handlers (60 modules under `commands/`). MiniGuardian carries the
 Smart Terminal part (shell, analyzers, language adapters, tools) and the catalog of names, but
-not the registry or those handlers. Result, measured by running every catalog name in a
-sandbox: 23 commands execute natively, 28 are ordinary host programs, 12 are documented
-subcommand forms, and **94 are catalogued but not implemented**; 92 of those have
-working handlers in the SDK. `commands` lists the catalog with the unavailable ones
+not the registry or those handlers. Many were ported in November 2026 on real state
+only (no canned output). Counted from the code on 2026-11-13: 159 catalog names, of
+which **67 are catalogued but not implemented**; the rest run natively, are ordinary
+host programs, or are documented subcommand forms. `commands` lists the catalog with the unavailable ones
 marked, and running one prints a clear message (exit 127). The earlier "200+ commands" figure was the SDK's count
 (226), not this build's.
 
-**Limits:** the `SmartTerminalV2` wrapper (`docs/design/TRUST_TERMINAL_V2.md`) is used only by an
+**Limits:** the `SmartTerminalV2` wrapper (internal design doc) is used only by an
 example program. One known evasion is recorded in code, in the test
 `known_gap_python_reverse_shell_is_not_caught_by_any_pattern`. `trust_terminal` is not in the
 `seal.hashes` pin list.
@@ -149,13 +157,10 @@ example program. One known evasion is recorded in code, in the test
   in fetched content is not flagged by that scanner (a deliberate fix for false
   positives); the tool-call gate and the sandbox are what stop the resulting
   action.
-- **The kernel judge is optional.** Without it the daemon is its own authority
-  and labels itself "self-attested". Under the shipped unit
-  (`MemoryDenyWriteExecute=yes`) QEMU's default accelerator cannot start, so
-  enabling `[kernel_vm]` needs a decision (hardware acceleration, a separate
-  unit, or relaxing that setting). Do not enable it without setting
-  `judge_mode = "best-effort"`, because the unset default is `strict` and a
-  failed launch would latch the paranoid state.
+- **The kernel judge has a boot latch.** In `strict` mode (shipped) the daemon
+  stays Paranoid until the judge is up and agrees, about 75 seconds after
+  start. If QEMU cannot run on a machine, set `judge_mode = "best-effort"`;
+  without a judge the daemon labels itself "self-attested".
 - **Trust from the kernel sidecar fails open for malformed replies** (a tracked
   design tension in `docs/SECURITY_FEATURES_CATALOG.md` §6.3).
 
@@ -164,11 +169,11 @@ example program. One known evasion is recorded in code, in the test
 | | Value | How to check |
 |---|---|---|
 | Kernel engines | 44 | `ENGINE_COUNT` in `jayce_kernel_src/src/kernel/engines/mod.rs` |
-| Governed tools | 29 (11 read-only, 18 approval-gated) | `ToolRegistry` in `trust_terminal/src/terminal/smart_terminal/tool_system.rs` |
-| Terminal commands | 157 unique catalog names (158 entries; `swarm` twice): 23 native, 28 host programs, 12 subcommand forms, 94 not implemented (measured 2026-09-19) | `docs/reports/claims-audit-2026-09-19/terminal-command-status.tsv` |
+| Governed tools | 52 (19 read-only, 33 approval-gated; counted 2026-11-13) | `ToolRegistry::new()` in `trust_terminal/src/terminal/smart_terminal/tool_system.rs` |
+| Terminal commands | 159 catalog names, 67 not implemented (counted 2026-11-13) | `COMMAND_CATALOG` and `NOT_IMPLEMENTED` in `trust_terminal/src/terminal/smart_terminal/command_reference.rs` |
 | Inline languages | 18, plus Apodeixis | `trust_terminal/src/terminal/smart_terminal/builtin.rs` |
 | Tests | about 2,260 `#[test]` functions across the workspace (counted 2026-09-19) | `grep -r '#\[test\]'` |
-| Daemon unit tests | 1341 passed, 0 failed, 2 ignored (2026-09-19) | `cargo test -p miniguard --lib` |
+| Daemon unit tests | 2,175 passed, 0 failed (2026-11-13) | `cargo test -p miniguard --lib --release` |
 | Status TUI tests | 25 passed (2026-09-19) | `cargo test -p miniguard-status` |
 | Terminal tests | 196 unit + 11 v2 integration passed (2026-09-19) | `cargo test -p trust_terminal` |
 
@@ -185,7 +190,7 @@ example program. One known evasion is recorded in code, in the test
 | `mg-why` | Explain why any program failed, in any language ([guide](EXPLAIN-A-FAILURE.md)) |
 | `mg-plugin`, `mg-open-shell` | Build, install and run your own plugins in any language ([quickstart](PLUGIN-QUICKSTART.md)) |
 | `mg-session-hub`, hook bridge | Route tool hooks to the right governed session |
-| `mg-collab`, `mg-chat*` | Multi-editor collaboration and governed chat |
+| `mg-chat*` | Governed chat (`mg-collab`, multi-editor collaboration, is built from source but not in the packages) |
 | `trust_terminal` | Standalone TRust command shell |
 
 ## Get started
@@ -199,7 +204,7 @@ sudo miniguard-status                # dashboard; press k for the kernel page
 `scripts/deploy.sh` is the wizard for choosing a mode (`sidecar`, `cohost`,
 `saddle`), workload and posture. After rebuilding `mg-cli`, sign it (the build
 signs it during `seal.sh` with your key) so its self-integrity check accepts it.
-Details are in `docs/AI_CONTAINMENT_MANUAL.md` §13 and `AGENTS.md`.
+Details are in `docs/AI_CONTAINMENT_MANUAL.md` §13.
 
 ## Where to read next
 
@@ -210,11 +215,13 @@ The full index is [`docs/README.md`](README.md).
 - The dashboard and the terminal: `docs/TUI_USER_GUIDE.md`,
   `docs/TRUST_COMMAND_MANUAL.md`
 - Everything the daemon can do: `docs/SECURITY_FEATURES_CATALOG.md`
-- Design specs: `docs/design/`; history: `AGENTS.md`, `CHANGELOG.md`
+- Release history: `CHANGELOG.md`
 - Papers (historical, kept as written): `docs/papers/`
-- Superseded documents (not maintained): `docs/archive/`
+- Design specs, operator notes and superseded documents are internal (not
+  published); reviewers and partners can ask for them.
 
 ## License
 
-Proprietary, source-available under the Jayce Automata Research Source License
-v1.0 (`LICENSE`).
+Proprietary, under the Jayce Automata Research Source License v1.1
+(`LICENSE`). Third-party components keep their own licences; see
+`THIRD_PARTY_NOTICES.md` (installed in `/usr/share/doc/miniguard/`).

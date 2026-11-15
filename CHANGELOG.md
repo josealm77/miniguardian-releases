@@ -2,6 +2,21 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-31 — Sat Nov 14 2026
+
+**Check your machine for known-vulnerable and tampered software.**
+
+- **Host supply-chain scan** (`mg-supply host-scan`, see `docs/HOST-SUPPLY-SCAN.md`):
+  - finds known-vulnerable packages across your projects, installed tools and system packages, from an offline advisory database (OSV);
+  - finds tampered system files (`dpkg --verify` / `rpm -V`);
+  - writes a local report only, with licence attribution — nothing is sent anywhere;
+  - runs on demand or on an opt-in weekly/daily timer; `--clean` removes the report, summary and database.
+  - A scan with new findings shows one notice, one audit entry, a line in the TUI and a section in `mgx`.
+- **AI Constitution in the TUI.** The Developmental page shows the AI Constitution with an owner bail key (Tab to select, `b` twice = one level up). Every privilege override is audited.
+- **Fewer passwords.** A pop-up for an item you already approved or denied elsewhere now says "already handled" instead of asking for your password.
+- **Licences.** Third-party notices are regenerated from the exact dependencies and installed with both the .deb and the .rpm (`/usr/share/doc/miniguard`).
+- **Fixed:** `apodeixis tokens` and `apodeixis ast` now exit with an error code when the input does not parse (they exited 0, so scripts could not tell).
+
 ## 0.9.1-beta-30 — Fri Nov 13 2026
 
 **Security update. Please install it.**

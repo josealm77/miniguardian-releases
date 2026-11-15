@@ -3,9 +3,9 @@
 > **Compiled from a full source sweep of the MiniGuardian workspace.**
 > This document catalogs every security feature in the codebase — protection,
 > detection, enforcement, **deception**, and **AI containment** — with the module
-> (file) that implements each one. Companion to `AGENTS.md`,
-> `docs/archive/security_assessment.md`, `docs/design/AI_WORKSPACE_ENVELOPE_SPEC.md`, and
-> `docs/archive/SELF_LEARNING_ARCHITECTURE.md`.
+> (file) that implements each one. Companion to the internal
+> design documents (operator notes, security assessment, workspace envelope
+> specification, self-learning architecture; not published).
 > Proprietary — Jayce Automata Research Source License v1.1. View/study/run for
 > personal evaluation; official packages may be shipped unmodified as a
 > dependency (see `LICENSE`); no modification or derivatives.
@@ -40,6 +40,7 @@
 25. [How It All Interlocks](#25-how-it-all-interlocks)
 26. [The Biggest Illusion: Self-Disguise & Probe-Feed](#26-the-biggest-illusion-self-disguise--probe-feed)
 27. [The Alien Bridge: Foreign-Sensor Ingestion](#27-the-alien-bridge-foreign-sensor-ingestion)
+28. [Added in Beta-26 to Beta-31](#28-added-in-beta-26-to-beta-31)
 
 ---
 
@@ -804,9 +805,11 @@ verdict from the continuous file monitor used to be silently recorded as a
 `block` from everything else, and the only operator-approval prompt fired once,
 at launch-line evaluation, before the child even spawned. Now a `score_risky`
 verdict during the live session queues (`mg_verdict_queue::push`), fires a
-desktop approval pop-up whose only button opens `sudo -k mg-cli session review`
-(`approval_prompt.rs`), and keeps the session running — resolved from another
-terminal via `sudo mg-cli session review` (or `approve|reject <id>`; listing with
+desktop approval pop-up (`approval_prompt.rs`) with **Approve** / **Deny** (each
+runs `pkexec mg-cli session approve|reject <id>`, so the password decides; a
+group of file actions also gets **Approve all**) and **Review** (a terminal
+running `sudo -k miniguard-status --approvals`), and keeps the session running.
+It can also be resolved from another terminal via `sudo mg-cli session review` (or `approve|reject <id>`; listing with
 `mg-cli session pending` needs no root). Approve/reject are **root-only**
 (SO_PEERCRED): the governed child runs as the session user, so a same-UID gate
 alone let it approve its own items (fixed 2026-09-26). Approve credits the
@@ -876,7 +879,7 @@ The future-proof adapter/registry model, shipped **detection-only** and gated:
 - **Deferred (hard gate)**: cgroup tag move, per-tag egress allowlist, GUI exec
   interception, registry session-state engine. Any egress rule that is host-wide
   or mis-scoped re-creates the opencode infinite-retry loop (R1 violation).
-  `docs/design/AIE_IMPLEMENTATION_RISK.md` lists the catastrophic-failure matrix and
+  The internal rollout risk analysis lists the catastrophic-failure matrix and
   the kill-switch / dry-run / chaos-suite preconditions that must pass first.
 
 ### 9.6 AI aggregation in the daemon
@@ -1157,11 +1160,11 @@ long-press=clear; in-app translation — never TIOCSTI).
   moved from the repo root in beta-30) — distro-integration policy installers.
 - **`scripts/deploy.sh`** also produces `miniguard-saddle`, `miniguard-status`,
   and bridges; `docker-compose.yml` + `Dockerfile` mount the containerized
-  presence (note the threat-model caveats in `docs/archive/security_assessment.md`:
+  presence (note the threat-model caveats in the internal security assessment:
   `network_mode: host`, `CAP_NET_ADMIN`/`CAP_BPF`, docker.sock mounted ⇒ a
   container daemon compromise ≈ host root — the sealed bare-metal/native path is
   the hardened deployment).
-- **Profile / posture selection** (docs/archive/security_assessment.md §7.5): user-mode vs
+- **Profile / posture selection** (internal security assessment §7.5): user-mode vs
   critical-systems maps to `security_enforcer.enforce_in_suspicious`,
   `exclusions.monitor_only`, sandbox-failure behavior (warn+continue vs abort),
   and sysctl hardening.
@@ -1173,7 +1176,7 @@ long-press=clear; in-app translation — never TIOCSTI).
 ## 14. Cross-Cutting Engineering Contracts
 
 These are the invariants the repo treats as **non-negotiable** (the "security
-contract" in AGENTS.md). Any feature that trades one away is treated as a
+contract" in the internal operator notes). Any feature that trades one away is treated as a
 regression:
 - **Static musl build only** — no dynamic `.so` surface.
 - **Zero warnings** workspace-wide; the full test matrix stays green.
@@ -1200,7 +1203,7 @@ regression:
   admits only decidable ground facts, and `Neq` closes only on ground values.
   "Proof-checked" mission guarantees are sound as of that fix; the residual
   tamper caveat (authoring-time validation of stored theorems) is covered by
-  the seal, not the checker (`docs/archive/security_assessment.md §7.4`).
+  the seal, not the checker (internal security assessment §7.4).
 - **Governance decisions are deterministic only, never LLM-reasoned**: every
   enforcement decision (allow/block/queue-for-review/escalate) comes from a
   rule, a proof-checked mission, a counter crossing a threshold, or a state
@@ -1219,7 +1222,7 @@ regression:
   `scripts/check_no_llm_in_enforcement.sh` (a coarse heuristic: it catches a
   *new* raw LLM-API call appearing in a governed-path file, not an existing
   call's result being newly wired into a decision it wasn't part of before),
-  run as part of "Verify after building anything on top" in `AGENTS.md`.
+  run as part of "Verify after building anything on top" in the internal operator notes.
 
 ---
 
@@ -1375,7 +1378,7 @@ attacker cannot rewrite what it "learned."
 ## 18. The Adapters, Bridges & Shims
 
 Every integration point is deliberate and capability-gated. This is the
-repository's stated "sanctioned ways in" (AGENTS.md).
+repository's stated "sanctioned ways in" (internal operator notes).
 
 ### 18.1 Language adapters (`trust_terminal/.../adapter.rs`, `builtin.rs`)
 A `LanguageAdapter` trait (name, extensions, `detect` confidence, `eval`,
@@ -1957,9 +1960,57 @@ between the unpredictable real world and the provable infrastructure (§8, §14)
 
 ---
 
-*End of catalog and deep dive. Operational run-books: `AGENTS.md`. Threat-model
-peer review + known caveats: `docs/archive/security_assessment.md`, §7.4 (Apodeixis
-proof-checker soundness + seal-tamper caveat), §7.3 (container mode privilege
-posture). AIE spec +
-risk gate: `docs/design/AI_WORKSPACE_ENVELOPE_SPEC.md` and
-`docs/design/AIE_IMPLEMENTATION_RISK.md`.*
+## 28. Added in Beta-26 to Beta-31
+
+Sections 1–27 were swept from the source in October 2026. These features came
+later. Items marked *beta-31* ship with that release.
+
+- **Attack immunity** (`immunity_ledger.rs`, `attack_memory.rs`; beta-27) — every attack
+  MiniGuardian contained is recorded with an exact (never fuzzy) fingerprint and
+  re-applied before the first tick, so a restart, or a crash an attacker forces,
+  does not reopen the door. The repeat of a stopped attack is refused at its
+  first step, under a new name or path. The owner lists and releases entries
+  with `sudo mg-op immunity list | release <id|ip>`.
+- **Open plugins** (`miniguard/src/open_plugins/`, `mg-open-shell`, `mg-plugin`;
+  beta-29) — plugins in any language run in a sandbox with no direct access to
+  files, network or other programs. Every request is checked against what the
+  owner approved at install; reads inside approved folders pass, writes,
+  commands and network ask. Anything a plugin starts ends with its run.
+- **Egress proxy** (`miniguard/src/egress/`; beta-29) — each plugin action gets
+  its own empty network namespace; with approved hosts, it reaches the internet
+  only through MiniGuardian's CONNECT proxy, which allows install-approved hosts,
+  asks about new ones and counts every byte. Governed AI sessions can opt in
+  (`[session_egress]`). A program that goes around the proxy has no network.
+- **`mg-why`** (`why_core/`; beta-29) — explains why a program failed (file and
+  line, cause, processes involved) with secrets masked; deterministic, no model.
+- **Supply Chain Sentinel v2** (`mg-supply audit`; beta-29) — a governed AI
+  session or plugin install is refused when a dependency does not match its
+  pinned checksum (Rust, Python, Node, git). git hooks, fsmonitor and filter
+  programs in a workspace are never executed by the check.
+- **MCP broker runs tools as the caller** (`mg-mcp-broker`; beta-30) — every
+  tool call runs with the rights of the user who made it; only that user or
+  root can approve it.
+- **Leak guard** (`leak_guard.rs`; beta-30) — before a governed AI session
+  publishes anything (`git push`, gists, release uploads), what would leave is
+  scanned: credentials and secrets files are refused outright, the owner's
+  personal information is flagged on the approval pop-up. Deterministic
+  patterns plus the owner's `[leak_guard]` list. See `LEAK-GUARD.md`.
+- **Owner bail-out key for AI privilege levels** (`miniguard-status`
+  Developmental page; *beta-31*) — the owner can raise an agent one privilege
+  level at a time (two presses); every override is written to the audit chain.
+- **Host supply-chain scan** (`mg-supply host-scan`, `mg-supply/src/host/`;
+  *beta-31*) — checks projects, installed tools and system packages against the
+  OSV advisory databases and every system file against what its package
+  installed (`dpkg --verify` / `rpm -V`). Report only: nothing is changed,
+  nothing is sent anywhere. The daemon raises one notice when a scan finds
+  something new. See `HOST-SUPPLY-SCAN.md`.
+- **Stale approval pop-ups ask no password** (`mg-cli session waiting`;
+  *beta-31*) — a pop-up for an item already decided in the TUI or another
+  pop-up says so instead of raising the password prompt.
+
+---
+
+*End of catalog and deep dive. Operational run-books, the threat-model peer
+review (§7.4 Apodeixis proof-checker soundness + seal-tamper caveat, §7.3
+container-mode privilege posture), the AIE spec and its risk gate are internal
+documents (not published; reviewers and partners can ask for them).*

@@ -98,8 +98,7 @@ network-cut/relay module, and an isolated test network.
   weapons or military use. Defence funding is declined on principle; the
   license's no-weaponization clause is non-waivable.
 - Enforcement decisions stay deterministic: rules, proof-checked missions,
-  counters. They are never decided by a language model (see `AGENTS.md`,
-  "Governance decisions").
+  counters. They are never decided by a language model (a permanent project rule).
 - Every claim ships with the test that proves it, and failures are published
   alongside successes.
 - Testing happens on isolated, disposable machines only.

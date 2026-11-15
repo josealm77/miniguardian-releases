@@ -231,6 +231,7 @@ Shipped in `plugins/opencode/plugins/`, loaded by opencode alongside `miniguard-
 - **`lib/mg-opencode-compat.js`** — `dualPlugin()` lets every MiniGuardian opencode plugin load unchanged on opencode 1.x and 2.x.
 
 ### 9. Integrations (outside `plugins/`)
+In the source tree (not in the packages, except the browser guard),
 `integrations/` holds editor/browser integrations that are not daemon plugins:
 `browser-guard` (governed browser webextension enforcing `[browser_guard]`),
 `jar-shield` (standalone browser extension), `vscode` and `zed` (mg-chat-bridge examples),
