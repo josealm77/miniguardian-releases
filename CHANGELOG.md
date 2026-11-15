@@ -2,6 +2,19 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-32 — Sat Nov 14 2026
+
+**Dangerous approvals are impossible to miss — and can't be approved by reflex.**
+
+- **Red means dangerous, and only that.** An approval turns red only for destructive commands, hidden code (decoded or downloaded-and-run), your credentials, things that run again after a restart, root or sandbox escape, and remote control. Everything else uses the normal style — red used to be on every pop-up.
+- **Every red item says why** in plain words ("Touches your credentials: ~/.ssh/id_rsa", "Runs code you cannot see"), and shows hidden text decoded.
+- **No reflex approvals.** A red item is approved only by typing its name. Approve all, groups, the timed window and auto-approve rules never approve a red item.
+- **Colours by what Enter does** on the approvals page: every row in one colour — green (Enter is fine), yellow (look first), red (destructive; it blinks and shows its reasons). Held kills of your own build tools (`ld`, `cc`, `cargo`, test programs) are red.
+- **A Deny that stops the AI session says so** ("Deny — stops the AI session") and asks once more.
+- After 10 approvals in 5 minutes, a red prompt reminds you to read it.
+- **Fewer pop-ups:** Python dependency folders (`.venv`, `site-packages`) no longer flood the approval queue.
+- `mg-cli session approve <id> --confirm <name>` for dangerous items from a terminal.
+
 ## 0.9.1-beta-31 — Sat Nov 14 2026
 
 **Check your machine for known-vulnerable and tampered software.**
