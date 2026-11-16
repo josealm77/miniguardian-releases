@@ -2,6 +2,29 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-33 — Sun Nov 15 2026
+
+**MiniGuardian now remembers a persistent attacker — even when it changes its IP, tools and timing.**
+
+- **Campaign memory for outside attackers.**
+  - MiniGuardian recognises an attack by *what it goes after and in what order*: credentials, persistence, a command-and-control server. It does not go by the IP or the tool.
+  - It never forgets with time. An attacker who waits, switches address or splits the work across several agents is still the same campaign.
+  - Your own devices, your LAN and your fleet peers are never treated as attackers.
+- **It learns from what a contained attacker keeps trying.** Once a campaign is contained, every new move it makes becomes an *antibody*: the shape of the move, with names and addresses removed. The next attacker of the same family is caught on first contact, even with no obvious hostile sign. Steps taken only by programs verified by your package manager (`ssh`, `aws`, `python3`) can never match a learned pattern on their own.
+- **Quiet toward the attacker, loud toward you.**
+  - A recognised attacker is quarantined silently, so it gets nothing to learn from.
+  - You get one **RED ALERT** pop-up per attack and a red banner in the TUI until you press `n`.
+  - When watching ends, the attacker is also put on the immunity list, which you can inspect and verify.
+- **Starts in shadow mode.** Out of the box it only reports what it *would* do: a yellow "ATTACK DETECTED — shadow mode" notice, and nothing blocked. Switch with `[campaign] mode = "live"` when you're happy with what it reports.
+- **You are always in control.** `sudo mg-op campaign list | explain <id> | release <id>` and `sudo mg-op campaign antibodies`. A release removes everything that campaign caused, and stays released.
+- **Containers covered.** Attacks that land inside a Docker container are traced back to the attacker's address.
+- **For security testers:** `[campaign] treat_as_outside = ["<test machine IP>"]` treats one LAN test machine as an outside attacker, for running your own pentest. It is shown in yellow in the TUI while set.
+- **Fixed:** confirming a governed migration in the TUI (`m` twice) froze the whole screen until the daemon answered. It now shows progress at once and stays usable.
+- Plus the beta-32 review follow-ups:
+  - more dangerous command forms are red;
+  - your own build tools' held kills need their name typed;
+  - a credential or persistence write is never green.
+
 ## 0.9.1-beta-32 — Sat Nov 14 2026
 
 **Dangerous approvals are impossible to miss — and can't be approved by reflex.**
