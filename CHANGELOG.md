@@ -2,6 +2,14 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-34 — Sun Nov 15 2026
+
+**Fixes two false alarms that could keep MiniGuardian in HOSTILE/PARANOID on a normal desktop.**
+
+- **Docker containers no longer look like an attack.** Every normal container was reported as "mounts sensitive host path /dev/…", because the check read the disk a file lives on instead of the path being mounted. It now looks at the real host path. A container's own files and its volumes are normal. Mounting your `/etc`, `/root`, `/boot`, `/dev`, your whole disk, or the Docker socket into a container is still caught, and those real cases are now caught more reliably than before.
+- **Firefox is no longer reported as a broken sandbox on Pop!_OS and Ubuntu.** There, Firefox's content processes are protected by a seccomp filter rather than a separate namespace. Only a content process with neither is flagged.
+- If MiniGuardian on your machine kept cycling between normal, hostile and paranoid after installing Docker, this release is the fix.
+
 ## 0.9.1-beta-33 — Sun Nov 15 2026
 
 **MiniGuardian now remembers a persistent attacker — even when it changes its IP, tools and timing.**
