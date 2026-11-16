@@ -2,6 +2,15 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-35 — Sun Nov 15 2026
+
+**Fewer false alarms on machines with GPUs, Docker and package upgrades.**
+
+- **GPU containers are recognised.** A container using your NVIDIA GPU (for example Ollama) is no longer reported as mounting sensitive host files. Docker's own "blank out this path" mounts are recognised too. Mounting real system files or other devices into a container is still caught.
+- **`apt upgrade` is never interrupted by MiniGuardian.** During an upgrade, the package manager briefly stages new scheduled-job files under temporary names. MiniGuardian used to move one of those away mid-upgrade, which could stall the upgrade. Those temporary names are never run by the system, so they are now left alone. The final file is still checked.
+- **Restarting Docker containers no longer looks like an attack.** A container restart (new virtual network card) was reported as ARP spoofing over and over. Docker's own container-start helper was reported as rooted malware. Normal system threads were reported as hidden processes. All three are fixed, and real cases are still caught.
+- **Slow-scan reports name the culprit.** When a scan cycle runs slow, the diagnostic report now says which check took the time.
+
 ## 0.9.1-beta-34 — Sun Nov 15 2026
 
 **Fixes two false alarms that could keep MiniGuardian in HOSTILE/PARANOID on a normal desktop.**
