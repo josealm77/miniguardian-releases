@@ -52,6 +52,20 @@ These commands run locally inside `trust_terminal` and directly interface with t
 | **`linter`** | `linter <file\|code> [lang]` | Multi-language linter for Rust, C, Go, Python, Bash, and JS. |
 | **`codesniffer`** | `codesniffer [file]` | Alias for `linter`. |
 
+### 1a. MiniGuardian operator commands (beta-37)
+
+These are host programs installed with MiniGuardian (`/usr/local/bin`; a sealed source install gets them from `scripts/seal.sh`). They run from any shell, including inside TRust. Most need `sudo`.
+
+| Command | Usage | Description |
+| :--- | :--- | :--- |
+| **`mg-explain`** | `sudo mg-explain [30m\|2h\|90s\|<unix time>] [--until=T] [--dig]` | One readable digest of what MiniGuardian decided and why. Starts with **at a glance**: what holds the current state (judge latch, quiet ticks, a remembered pattern) and one OK/FAIL line per part (judge, containment, eBPF pins, audit chain, ransomware vault, fleet, pentest window, held kills). Repeated entries are collapsed (`×30 since 09:07`); known harmless warnings carry a `why:` note; removal plans for confirmed rooted malware are listed with their steps. Right after a restart it says the daemon is still starting. |
+| **`mg-op`** | `sudo mg-op <command>` | Sends one operator command to the daemon, e.g. `ransomware list`, `ransomware resume <pid>`, `immunity list`, `download pending`, `fleet:glance`, `fleet:accept <node> build=<b>`. |
+| **`mg-fleet`** | `sudo mg-fleet init` · `add <name>` · `join <bundle.tar>` · `peer add\|remove <ip>` · `status` | Puts your machines in one fleet: one fleet certificate authority (its key stays on the first machine), a certificate per machine, a shared token, enrollment bundles. Enrolled machines find each other on the local network by themselves. Settings live in `/etc/miniguard-fleet/`, outside the sealed config. Restart MiniGuardian after a change. A bundle holds a private key: copy it, join, then `shred -u` every copy. |
+| **`mg-op fleet:glance`** | `sudo mg-op fleet:glance` | Every fleet peer's latest **signed** status (brain state, judge, containment, held kills, top near-misses), its verdict (healthy / unconfirmed / suspected — suspected needs two machines to agree) and the evidence. Peers observe and report; none acts on another machine. |
+| **`mg-pentest`** | `sudo mg-pentest open --target <ip\|cidr> [--api <host>] (--container <name> \| -- <cmd>) [--for 2h]` · `status` · `close` | Licensed developer feature: a time-limited window in which the named tools may attack the named targets from this machine; they can reach only those targets (plus the AI model's API) and every other protection still applies to them. Needs a licence signed for this machine and your approval on a red pop-up (type `PENTEST`). Says READY only once the network lock is in place. |
+| **`mg-map`** | `mg-map index\|overview\|where <name>\|callers <name>\|impact <name>\|vars <fn>\|changes\|failures\|ai-edits\|list\|clear [--all]` `[--dir <path>] [--json] [--tests]` | Developer tool (not in the beta package yet): maps a project's own code (Python, JavaScript, Rust) — where things are defined, who calls what, what depends on a function, a function's variables, what changed since `index`, where `mg-why` failures happened, and which files an AI session last wrote. Reads, never runs; libraries stay named boxes. `--json` for AI agents. `sudo mg-map ai-edits clear [--all]` erases the AI-edit trail. |
+| **`mg-why`** | `mg-why -- <command…>` | Runs a program and, if it fails, says where in your own code it broke, what caused it and which processes were involved (any language with a language file). |
+
 ---
 
 ## 2. Microkernel & Engine Commands

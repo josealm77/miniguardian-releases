@@ -2,6 +2,28 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-37 — Wed Nov 18 2026
+
+**Slower machines no longer get stuck in PARANOID, and a developer pentest mode.**
+
+- **The kernel judge gets enough time to start.** On slower or busy machines the judge took longer than MiniGuardian waited for it (18 seconds measured on a laptop, against a 10-second limit). It was then counted as missing, and in strict mode MiniGuardian stayed in PARANOID all day, which made it freeze ordinary installs and builds far more often. The wait is now 60 seconds.
+- **Docker image builds are recognised as containers,** so `docker build` / `docker compose build` steps are no longer reported as rooted malware.
+- **The dashboard shows which version is installed,** in the corner of the MINI GUARDIAN box.
+- **`sudo mg-explain` starts with "at a glance":** what is holding the current state and why, then one OK/FAIL line per part (judge, containment, audit chain, ransomware vault…). Repeated entries are collapsed ("×30 since 09:07"), and common harmless warnings carry a short "why" note. Without a Jayce sidecar the trust link now shows N/A instead of DOWN.
+- **Fleet: your machines watch each other.** `sudo mg-fleet init` on one machine creates your fleet; `sudo mg-fleet add <name>` makes an enrollment file for each other machine and `sudo mg-fleet join` enrolls it. Enrolled machines find each other on your local network by themselves, and only machines carrying your fleet's certificates can join. Every machine then sends a signed heartbeat once a minute with its status. If one goes silent while still connected (its defences killed?), signs with a different key, replays old messages, or reports different traffic than its neighbour sees, the others flag it. A machine is marked suspected only when two others agree, so one compromised machine cannot get a healthy one blamed, and no machine ever acts on another. See it with `sudo mg-op fleet:glance` or the fleet line in `sudo mg-explain`. Allow TCP 19877 and UDP 19878 between your machines.
+- **A removal plan for confirmed rooted malware.** MiniGuardian already freezes confirmed malware and blocks its file from running again. `sudo mg-explain` now also shows how to get rid of it: reinstall the package if a system file was replaced, move an unknown file to quarantine (never deleted), the startup entries that would bring it back with the command for each, then end the frozen process and change passwords. If there are signs of kernel-level access, the plan says plainly to check from outside the system (USB boot) or reinstall. MiniGuardian runs none of these steps itself.
+- **AI sessions leave a trail they cannot erase.** Every file change a governed AI session makes is recorded where the AI cannot change or delete it, for the coming code-map tool to show which code an AI wrote.
+- **`mg-explain` explains more:** what is holding a SUSPICIOUS state (for example a remembered container pattern), a fleet line, only this window's ransomware incidents (older ones counted), and a clear "still starting" message right after a restart. Machines installed from source with `seal.sh` now get `mg-explain`, `mg-op`, `mg-pentest` and `mg-fleet` too.
+- **`mg-pentest` (developer feature, needs a licence from Jayce Automata Research).** Opens a time-limited window in which named pentest tools may attack named target machines from this computer. The tools can reach only those targets (plus their AI model's API); every other protection still applies to them, and what MiniGuardian would have blocked is recorded. It needs a licence signed for this machine and your approval on a red pop-up. Without a licence the command does nothing.
+
+## 0.9.1-beta-36 — Sun Nov 15 2026
+
+**No false "rooted malware" after updates or for container apps.**
+
+- **After a system update, running services are no longer called rooted malware.** When an update replaces a program that a service is still running (for example Python under a system service), the old copy shows as deleted. MiniGuardian used to treat that as a planted binary, and could jump to PARANOID. It now recognises a program the package manager replaced. A deleted program anywhere else is still flagged.
+- **Programs inside Docker and other containers** are no longer compared against your host's own program list, which they were never part of. Containers are still watched by the container guard.
+- **Slow-scan reports cover the whole cycle,** so any remaining slowness can be traced to the exact step.
+
 ## 0.9.1-beta-35 — Sun Nov 15 2026
 
 **Fewer false alarms on machines with GPUs, Docker and package upgrades.**
