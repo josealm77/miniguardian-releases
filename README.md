@@ -10,14 +10,6 @@ Almendarez**, Jayce Automata Research.
   human to approve it, and the decision needs your password. Enforcement is
   deterministic: rules, proof-checked missions and counters, never a language
   model.
-- **Approvals you can't click through by reflex.** Only dangerous requests
-  turn red: destructive commands, hidden code, your credentials, things that
-  run again after a restart, root or sandbox escape, and remote control. Each
-  one says why in plain words and is approved only by typing its name;
-  approve-all, timed windows and auto-approve rules never cover it.
-- **Leak guard.** Before a governed AI session pushes or publishes anything,
-  MiniGuardian reads what would leave: credentials and secrets files are
-  refused outright, and your personal information is flagged on the pop-up.
 - **Host protection.** Process, file, memory, network and browser detectors
   feed a threat brain that rates the host Calm, Suspicious, Hostile or Paranoid,
   and can block, quarantine and restore.
@@ -28,17 +20,20 @@ Almendarez**, Jayce Automata Research.
   - ransomware is paused mid-run and the files are restored;
   - an attack it stopped once is refused at its first step next time, after
     a restart and under a new name or path;
-  - every attack it survives makes the machine harder to attack again.
-- **Campaign memory.** A persistent outside attacker is recognised by what it
-  goes after and in what order, not by its IP or tools, so waiting, switching
-  address or splitting the work across agents does not reset it. A recognised
-  attacker is quarantined silently and you get one red alert. It starts in
-  shadow mode (report only) until you set `[campaign] mode = "live"`.
-- **Fleet.** Your machines watch each other with signed heartbeats. A machine
-  that goes silent, changes keys or reports traffic its neighbour doesn't see
-  is flagged, and is marked suspected only when two others agree, so one
-  compromised machine can't get a healthy one blamed. No machine ever acts on
-  another.
+  - every attack it survives makes the machine harder to attack again;
+  - a persistent outside attacker is recognised by what it goes after, even
+    when it changes its IP, tools and timing (campaign memory; reports only
+    until you switch it to live).
+- **Dangerous approvals can't be approved by reflex.** Destructive commands,
+  hidden code, your credentials and anything that would run again after a
+  restart are shown in red with the reason, and are approved only by typing
+  the item's name.
+- **Your machines watch each other.** `sudo mg-fleet` puts your machines in
+  one fleet; each sends a signed heartbeat, and a machine that goes silent or
+  changes is flagged when two others agree. No machine acts on another.
+- **It explains itself.** `sudo mg-explain` says what MiniGuardian decided
+  and why, starting with one line per part, and for confirmed rooted malware
+  lists the steps to remove it.
 - **Kernel judge.** An independent copy of the decision engines runs in its
   own small VM and must agree with every decision, so taking over root alone
   is not enough to change what MiniGuardian decides.
@@ -56,10 +51,6 @@ Almendarez**, Jayce Automata Research.
   - one pop-up per new site;
   - every connection recorded;
   - programs that go around the proxy have no network.
-- **Explains itself.** `sudo mg-explain` starts with what is holding the
-  current state and why, then one OK/FAIL line per part. For confirmed rooted
-  malware it also lays out a removal plan (reinstall, quarantine, the startup
-  entries that would bring it back), which it never runs on its own.
 - **Jayce kernel engines.** The daemon runs the kernel's engines in-process at
   1 kHz, including the Impossible State Detector, the Predictive Execution
   Horizon and the Self-Healing Causality Mesh, and the dashboard shows them live.
@@ -83,25 +74,6 @@ This repository holds the **signed beta packages** (under
 [Releases](../../releases)) and the **public documentation**. The MiniGuardian
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
-
-## What's new in 0.9.1-beta-37
-
-- **Slower machines no longer get stuck in PARANOID.** The kernel judge now
-  gets 60 seconds to start instead of 10.
-- **Fleet.** `sudo mg-fleet init` on one machine, then
-  `sudo mg-fleet add <name>` and `sudo mg-fleet join` for the others. Allow
-  TCP 19877 and UDP 19878 between them, and check with
-  `sudo mg-op fleet:glance`.
-- **A removal plan for confirmed rooted malware** in `sudo mg-explain`.
-- **AI sessions leave a trail they cannot erase.** Every file change a
-  governed AI session makes is recorded where the AI cannot change or delete it.
-- **Fewer false alarms** from Docker builds, GPU containers, container
-  restarts and system updates (beta-34 to beta-37).
-- **`mg-pentest`** (developer feature, needs a licence): a time-limited
-  window in which named pentest tools may attack named target machines.
-- The dashboard shows the installed version.
-
-Full history: [CHANGELOG](CHANGELOG.md).
 
 ## Install the beta (0.9.1-beta-37)
 
@@ -149,8 +121,6 @@ Open the dashboard with `sudo miniguard-status` and run an AI tool
 governed with `sudo mg-cli claude` (or `opencode`, and others). Start with the
 [TUI User Guide](docs/TUI_USER_GUIDE.md) and the
 [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md).
-If the state ever looks
-wrong, `sudo mg-explain` says what is holding it and why.
 
 ## Build with MiniGuardian
 
@@ -227,6 +197,7 @@ sudo systemctl daemon-reload
 
 - [Overview](docs/overview.md): what is implemented, partial and planned
 - [TUI User Guide](docs/TUI_USER_GUIDE.md), [Error and Recovery Guide](docs/MINIGUARDIAN_ERROR_GUIDE.md)
+- [Commands manual](docs/TRUST_COMMAND_MANUAL.md): `mg-explain`, `mg-op`, `mg-fleet`, `mg-pentest` and the TRust terminal
 - [AI Containment Manual](docs/AI_CONTAINMENT_MANUAL.md), [Governed Tools Reference](docs/GOVERNED_TOOLS_REFERENCE.md)
 - [Security Features Catalog](docs/SECURITY_FEATURES_CATALOG.md)
 - [Host supply-chain scan](docs/HOST-SUPPLY-SCAN.md), [Leak guard](docs/LEAK-GUARD.md), [Secure updates](docs/SECURE_UPDATES_GUIDE.md)

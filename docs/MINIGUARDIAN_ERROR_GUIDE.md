@@ -10,7 +10,8 @@
 3. [Ransomware & Storage Protection Alerts](#3-ransomware--storage-protection-alerts)
 4. [Apodeixis Code Interpreter & Proof Errors](#4-apodeixis-code-interpreter--proof-errors)
 5. [Robot & Fleet Command Fabric (RCF) Errors](#5-robot--fleet-command-fabric-rcf-errors)
-6. [Quick Remediation Commands](#6-quick-remediation-commands)
+6. [Stuck in PARANOID, fleet and removal plans (beta-37)](#6-stuck-in-paranoid-fleet-and-removal-plans-beta-37)
+7. [Quick Remediation Commands](#7-quick-remediation-commands)
 
 ---
 
@@ -30,6 +31,15 @@ state, and recent warnings. `--dig` follows that evidence through fixed,
 read-only checks to a one-line conclusion per trigger; a "stopped at" line
 names what is not recorded yet. It changes nothing. Needs `socat` and
 `python3` (installed with the package).
+
+From beta-37 the report starts with **at a glance**: if the state is not
+normal, what is holding it and why (for example `kernel judge absent … strict
+mode stays Paranoid until it is present`, or a remembered container pattern),
+then one line per part: judge, containment, audit chain, ransomware vault,
+attack memory, trust link, fleet, pentest window, removal plan, held kills.
+Repeated entries are collapsed (`×30 since 09:07`) and common harmless
+warnings carry a short `why:` note. `MiniGuardian is still starting (no
+operator socket yet)` right after a restart means: run it again in a minute.
 
 In the TRust terminal, `build`, `check` and `test` do the same for code: a
 failure prints a fix summary (cause, file and line, what was ruled out, the
@@ -132,7 +142,20 @@ it was loading, and the crash lines from the journal.
 
 ---
 
-## 6. Quick Remediation Commands
+## 6. Stuck in PARANOID, fleet and removal plans (beta-37)
+
+| What you see | Cause | What to do |
+| :--- | :--- | :--- |
+| PARANOID for a long time after boot; `mg-explain` says `kernel judge absent (reason: lost)` | The kernel judge (a small VM) sent no telemetry in time. Before beta-37 the wait was 10 s; a slow or busy machine needs longer (18 s was measured on a laptop). In strict mode MiniGuardian stays Paranoid while the judge is absent. | Update to beta-37 or later (the wait is 60 s). The judge is launched once per daemon start: `sudo systemctl restart miniguard` relaunches it. If QEMU cannot run on the machine, set `[kernel_vm] judge_mode = "best-effort"`. |
+| `fleet  off — …` in `mg-explain` | This machine is not enrolled in a fleet. | Optional. To join: `sudo mg-fleet init` on the first machine, `sudo mg-fleet add <name>` there, `sudo mg-fleet join <file>` on the other one, then `sudo systemctl restart miniguard` on both. See `TRUST_COMMAND_MANUAL.md` §1a. |
+| `fleet  on (node …) — no peers yet` | Enrolled, but no other machine found yet. | Both machines need to be on the same local network, with TCP 19877 and UDP 19878 allowed between them, or add a peer by address: `sudo mg-fleet peer add <ip>`. |
+| `fleet  FAIL … suspected` | Two or more of your other machines agree that one machine went silent, changed its key, replayed old messages or reported traffic its neighbours did not see. | Check that machine from the outside: `sudo mg-op fleet:glance` shows each finding. No machine acts on another; the response is yours. If you reinstalled it on purpose (new key), accept it with `sudo mg-op fleet:accept <node> key=<new key>` (or `build=<new build>` after an update), using the values `fleet:glance` shows. |
+| `removal plan  WAIT N confirmed malware` | MiniGuardian confirmed rooted malware, froze it and blocked its file. | Read the `removal plans` section of `mg-explain`: reinstall the package if a system file was replaced, move an unknown file to quarantine, remove the startup entries it lists, then end the frozen process and change passwords. MiniGuardian runs none of these steps itself. If the plan reports signs of kernel-level access, check the machine from a USB boot or reinstall. |
+| Docker builds or containers reported as rooted malware or as mounting `/dev` | False alarms fixed in beta-34 to beta-37. | Update. Real cases (your `/etc`, `/root`, the Docker socket mounted into a container) are still caught. |
+
+---
+
+## 7. Quick Remediation Commands
 
 ```bash
 # 1. Clear TUI Audit Feed & Telemetry Counters:

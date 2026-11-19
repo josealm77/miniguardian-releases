@@ -540,6 +540,17 @@ Every containment decision is auditable locally on the node:
 
 Use `ri_audit` or the socket `ri_audit` command to dump the full local state.
 
+**AI-edit trail (beta-37).** Every file change the file monitor attributes to
+a governed `mg-cli` session is recorded by the governor (running as root): time,
+agent, action, path and the file's sha256 afterwards, one line per change, in
+`/var/lib/jayce/ai-edits/<uid>/YYYY-MM-DD.jsonl`. The folder is owned by root
+with your group able to read it (directory 0750, files 0640): you can read your
+own trail, the AI session cannot change or delete it. Finished days are packed
+with the JVC compressor (`.mgaie`) only after the packed copy has been checked
+to unpack to the same bytes. The trail is meant for the coming code-map tool,
+which will show which code an AI wrote. It records what the file monitor
+attributes to the session; a write the monitor cannot attribute is not in it.
+
 **Privacy note:** These audit logs remain on the local machine unless the operator explicitly links the node to the J.A.R. master console. When linked, only anonymized attack signatures are uploaded for swarm immunization; full audit logs are never transmitted.
 
 ---
@@ -565,6 +576,16 @@ The AI containment subsystem must never be bypassed. The following rules are non
 > MiniGuardian node can verify and apply signed immunity rules (the `[fleet]`
 > section below, off by default), and nodes can exchange them with each other
 > over the authenticated gossip transport. Nothing is uploaded anywhere.
+>
+> **Also shipping (beta-37): your own machines as a fleet.** `mg-fleet`
+> enrolls your machines into a fleet you own (its certificate authority stays
+> on your first machine). Enrolled machines find each other on the local
+> network, exchange a signed heartbeat once a minute and flag a machine that
+> goes silent, changes its key, replays messages or reports traffic its
+> neighbours did not see; a machine is marked suspected only when two others
+> agree, and no machine acts on another. This runs entirely between your
+> machines, with no console and nothing sent to J.A.R. See
+> `TRUST_COMMAND_MANUAL.md` §1a.
 
 The Jayce Automata Research (J.A.R.) Master Console is the planned fleet-wide coordination surface for MiniGuardian instances: a hub, to be hosted by J.A.R., through which distributed nodes would share attack intelligence and receive immunization updates.
 
@@ -731,7 +752,7 @@ mg-cli [OPTIONS] <TARGET-CLI> [CLI-ARGS...]
 | `--allow-dns` | Permit DNS resolution egress (TCP 53 / DoT). Opt-in. |
 | `--net-ports LIST` | Comma-separated outbound TCP ports to allow (default: none). |
 | `--allow-network` | Leave TCP/UDP unrestricted for this session. Logged loudly — this is the governance breaker. |
-| `--governed-identity` | Drop to the dedicated `jayce-governed` UID. Reads only the daemon-owned `/etc/miniguard/miniguard.toml`; fail-closed; never self-provisions. See `IDENTITY_FIREWALL_SHADOW_TEST_PLAN.md`. |
+| `--governed-identity` | Drop to the dedicated `jayce-governed` UID. Reads only the daemon-owned `/etc/miniguard/miniguard.toml`; fail-closed; never self-provisions. Its shadow test plan is internal (not published). |
 | `--allow-quarantined` | Override a Supply-Chain-Sentinel BLOCK (logged loudly). |
 
 **Network egress is default-deny.** A governed session has no TCP egress unless

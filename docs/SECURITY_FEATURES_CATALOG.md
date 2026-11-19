@@ -1960,10 +1960,10 @@ between the unpredictable real world and the provable infrastructure (§8, §14)
 
 ---
 
-## 28. Added in Beta-26 to Beta-31
+## 28. Added in Beta-26 to Beta-37
 
 Sections 1–27 were swept from the source in October 2026. These features came
-later. Items marked *beta-31* ship with that release.
+later; each names the release it shipped in.
 
 - **Attack immunity** (`immunity_ledger.rs`, `attack_memory.rs`; beta-27) — every attack
   MiniGuardian contained is recorded with an exact (never fuzzy) fingerprint and
@@ -2007,6 +2007,64 @@ later. Items marked *beta-31* ship with that release.
 - **Stale approval pop-ups ask no password** (`mg-cli session waiting`;
   *beta-31*) — a pop-up for an item already decided in the TUI or another
   pop-up says so instead of raising the password prompt.
+- **Dangerous approvals** (`approval_risk.rs`; *beta-32*) — a fixed rule set
+  marks an approval red when it is destructive, runs hidden code, touches
+  credentials, persists, gains root or leaves the sandbox, gives remote
+  control or sends credentials out. A red item shows its reasons (hidden text
+  decoded) and is approved only by typing its name, on every path (pop-up,
+  TUI, `tool:approve`, `mg-cli session approve --confirm`). Approve all,
+  groups, the timed window and auto-approve rules skip it. The TUI colours
+  every row green / yellow / red by what Enter would do.
+- **Campaign memory and antibodies** (`campaign_ledger/`; *beta-33*) — an
+  outside attacker is recognised by the shape of what it goes after and in
+  what order, not its IP or tool, and is never forgotten with time. Once a
+  campaign is contained, each new move becomes an antibody (the shape with
+  names and addresses removed) that catches the next attacker of the same
+  family on first contact; steps made only by programs verified by the
+  package manager cannot match on their own. Silent toward the attacker, one
+  RED ALERT to the owner. Your own devices, LAN and fleet peers are never
+  treated as attackers (except addresses listed in `[campaign]
+  treat_as_outside` for a pentest). Ships in **shadow mode** (reports only).
+  `sudo mg-op campaign list | explain <id> | release <id> | antibodies`.
+- **False-alarm fixes for desktops with Docker, GPUs and updates**
+  (*beta-34 to beta-37*) — container mounts are judged by the real host path;
+  GPU containers, Docker's own helpers, container restarts, `docker build`
+  steps and programs replaced by a package upgrade are no longer reported as
+  attacks. Mounting `/etc`, `/root`, `/boot`, `/dev`, the whole disk or the
+  Docker socket into a container is still caught.
+- **Kernel judge start-up grace** (`kernel_vm.rs`; *beta-37*) — the daemon
+  waits up to 60 s (was 10 s) for the judge VM's first telemetry, so slow
+  machines no longer stay Paranoid in strict mode.
+- **`mg-explain` at a glance** (`scripts/mg_explain.sh`; *beta-37*) — what is
+  holding the current state and why, then one line per part (judge,
+  containment, audit chain, vault, attack memory, trust link, fleet, pentest
+  window, removal plan, held kills), with repeats collapsed and "why" notes.
+- **Fleet peer checks** (`fleet_peer.rs`, `fleet_enroll.rs`,
+  `fleet_discovery.rs`, `mg-fleet`; *beta-37*) — the owner's machines enroll
+  into a fleet with its own certificate authority; they find each other by a
+  signed announcement on the local network (UDP 19878, private addresses
+  only; mutual TLS on TCP 19877 still decides), exchange a signed heartbeat
+  every minute and report a peer that goes silent, changes key, replays,
+  changes build or reports traffic its neighbours did not see. A peer is
+  *suspected* only when two observers agree; no machine acts on another.
+  `sudo mg-op fleet:glance`. Not yet tested across two machines.
+- **Rooted-malware removal plan** (`removal_plan.rs`; *beta-37*) — for
+  confirmed rooted malware (already frozen and blocked), `mg-explain` lists
+  the steps: reinstall the package if a system file was replaced, move an
+  unknown file to quarantine (never delete), the startup entries that would
+  bring it back, the remote addresses it used, and, with signs of
+  kernel-level access, a plain warning to check from outside the system.
+  Suggestions only; MiniGuardian runs none of them.
+- **AI-edit trail** (`ai_edits.rs`; *beta-37*) — every file change attributed
+  to a governed AI session is recorded by the root governor where the AI
+  cannot change or delete it, packed with JVC once the day is closed.
+- **Pentest window** (`pentest_window.rs`, `mg-pentest`; *beta-37*) — a
+  developer feature: needs a licence for this machine signed with the
+  Jayce Automata Research key compiled into the build, plus the owner typing
+  `PENTEST` on a red pop-up. For a limited time, the named tools (containers
+  or one command) may reach only the named targets and their AI model's API;
+  eBPF refuses everything else, every other protection still applies, and
+  what would have been blocked is recorded. Without a licence it does nothing.
 
 ---
 

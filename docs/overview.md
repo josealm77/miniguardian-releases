@@ -1,14 +1,15 @@
 # MiniGuardian — Overview
 
-*Status as of 2026-09-19, re-checked against the source 2026-09-26 and
-2026-11-13 (beta-31). The
+*Status as of 2026-09-19, re-checked against the source 2026-09-26,
+2026-11-13 (beta-31) and 2026-11-19 (beta-37). The
 2026-09-19 evidence is in an internal claims-audit report (not published;
 reviewers can ask for it). Numbers carry
 the date they were measured.*
 
 ## What it is
 
-MiniGuardian is a security daemon for a single Linux machine. It watches
+MiniGuardian is a security daemon for a Linux machine (from beta-37, your
+machines can also watch each other as a fleet). It watches
 processes, files, memory and network activity, rates the host as
 **Calm → Suspicious → Hostile → Paranoid**, and can block, quarantine or
 restore things when the rating rises. Its distinguishing feature is
@@ -33,6 +34,7 @@ the kernel can also run on its own in QEMU.
 | Sealing | Immutable binaries and a hash manifest, re-checked about every 2 minutes | Implemented |
 | `mg-cli` governor | Runs an AI tool under Landlock: file sandbox plus **default-deny TCP** (kernel 6.7+), a proof-checked action gate, a fake-response layer for escape attempts, a dependency check before launch, and (under sudo, CLI tools) no access to the desktop: X server, session D-Bus and Wayland sockets are hidden so the agent cannot fake pointer or keyboard input | Implemented (desktop isolation added 2026-09-26) |
 | Human approval | Queued actions (tool calls, unregistered tools, risky file actions) raise a desktop pop-up with **Approve**, **Deny** and **Review**; approving a session's file action asks for your password (pkexec), and the TUI's approvals page decides the same queue. From beta-31 a pop-up whose item was already decided asks no password | Implemented, in daily use |
+| Dangerous approvals | Destructive commands, hidden code, credentials, persistence, root/sandbox escape and remote control are red, list their reasons, and are approved only by typing the item's name; no group, window or rule approves them | Implemented (beta-32) |
 | Governed tools | 52 built-in tools; reading is automatic, writing, running, deleting, network and memory ingest wait for human approval | Implemented |
 | Content scanners | Prompt-injection guard, memory-poisoning scanner, tool-call gate, exposed on a read-only local socket | Implemented (see limits) |
 | Identity firewall | UID-scoped UDP policy for the governed account | Implemented, **off by default** (shadow mode first) |
@@ -43,12 +45,18 @@ the kernel can also run on its own in QEMU.
 | TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 67 of the 159 catalogued commands are not implemented here, and are marked as such (see below; counted from the code 2026-11-13). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands |
 | Cosmic Map | 2D fleet observatory | **Not available in this beta**: `miniguard --map` prints a "not available" message; the `cosmic_map` crate still builds a standalone binary that is not installed |
 | Attack immunity | Every contained attack is remembered and refused at its first step next time, after a restart and under a new name or path (`sudo mg-op immunity list`) | Implemented (beta-27) |
+| Campaign memory | Recognises an outside attacker by what it goes after and in what order, across IP, tool and timing changes; learns antibodies from a contained attacker (`sudo mg-op campaign list`) | Implemented (beta-33); **shadow mode by default** (reports only) until `[campaign] mode = "live"` |
+| Rooted-malware removal plan | For confirmed rooted malware, `mg-explain` lists the steps to remove it (reinstall, quarantine, startup entries, kernel-level warning) | Implemented (beta-37); suggestions only, MiniGuardian runs none of them |
+| `mg-explain` | What the daemon decided and why, starting with an "at a glance" health list | Implemented (beta-25; at a glance beta-37) |
+| AI-edit trail | Every file change a governed AI session makes is recorded where the AI cannot change it | Implemented (beta-37); the code-map tool that reads it is not shipped yet |
+| `mg-pentest` | A time-limited window in which named pentest tools may reach named targets from this machine | Implemented (beta-37); developer feature, needs a licence signed by Jayce Automata Research for the machine and an owner approval |
 | Download guard | Executable downloads are quarantined until you release them | Implemented |
 | Open plugins | Plugins in any language in a sandbox; every action checked against what you approved at install (`mg-plugin`) | Implemented (beta-29) |
 | Egress proxy | Plugin commands (and, opt-in, AI sessions) reach the internet only through MiniGuardian's proxy; new sites ask | Implemented (beta-29) |
 | `mg-why` | Explains why a program failed, in any language, secrets masked | Implemented (beta-29) |
 | Leak guard | Before a governed AI session publishes, credentials are refused and personal information is flagged | Implemented (beta-30) |
 | Host supply-chain scan | `sudo mg-supply host-scan`: projects, tools and system packages against public advisories; system files against their packages; local report only | Implemented (beta-31) |
+| Your own fleet | `mg-fleet` enrolls your machines; they find each other on the local network, exchange signed heartbeats and flag a machine that goes silent or changes (two must agree) | Implemented (beta-37); **not yet tested across two machines** |
 | Master Console, fleet intelligence, swarm immunity | Cross-host dashboard, rule distribution, shared attack signatures | **Future plan.** Nothing is deployed (hosting needs paid infrastructure). A console prototype exists as a separate project outside this repo. The daemon can verify signed fleet rules (`[fleet]`, off by default) but has no console client |
 | Bare-metal OS installer | Boot the kernel as the operating system | **Not shipped**: the installer script is a stub |
 | Windows / macOS | | Not supported (Linux only) |
@@ -159,7 +167,9 @@ example program. One known evasion is recorded in code, in the test
   action.
 - **The kernel judge has a boot latch.** In `strict` mode (shipped) the daemon
   stays Paranoid until the judge is up and agrees, about 75 seconds after
-  start. If QEMU cannot run on a machine, set `judge_mode = "best-effort"`;
+  start. From beta-37 it waits up to 60 seconds for the judge's first
+  telemetry (slow machines need it; before, 10 seconds left them Paranoid). If
+  QEMU cannot run on a machine, set `judge_mode = "best-effort"`;
   without a judge the daemon labels itself "self-attested".
 - **Trust from the kernel sidecar fails open for malformed replies** (a tracked
   design tension in `docs/SECURITY_FEATURES_CATALOG.md` §6.3).
@@ -173,7 +183,7 @@ example program. One known evasion is recorded in code, in the test
 | Terminal commands | 159 catalog names, 67 not implemented (counted 2026-11-13) | `COMMAND_CATALOG` and `NOT_IMPLEMENTED` in `trust_terminal/src/terminal/smart_terminal/command_reference.rs` |
 | Inline languages | 18, plus Apodeixis | `trust_terminal/src/terminal/smart_terminal/builtin.rs` |
 | Tests | about 2,260 `#[test]` functions across the workspace (counted 2026-09-19) | `grep -r '#\[test\]'` |
-| Daemon unit tests | 2,175 passed, 0 failed (2026-11-13) | `cargo test -p miniguard --lib --release` |
+| Daemon unit tests | 2,478 passed, 2 failed, 26 ignored (2026-11-19, run inside a governed AI session; the 2 failures are health-server tests that open a TCP connection, which the session's sandbox refuses) | `cargo test -p miniguard --lib --release` |
 | Status TUI tests | 25 passed (2026-09-19) | `cargo test -p miniguard-status` |
 | Terminal tests | 196 unit + 11 v2 integration passed (2026-09-19) | `cargo test -p trust_terminal` |
 

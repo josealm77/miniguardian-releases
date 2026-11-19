@@ -45,6 +45,8 @@ locks down anything it can't prove safe, and keeps AI agents inside their box.
   (need **human approval**).
 - Every call passes 5 gates: validation → proof check → capability → **human
   gate** → audit log.
+- **Dangerous approvals are red** and need the item's name typed; no "approve
+  all", timed window or rule can approve them.
 - **mg-cli** wraps any AI tool in a workspace sandbox + supply-chain check.
 - **TRust v2** is the governed command center; its **`mg-trust-tool` CLI** lets
   AI agents code safely through the same 52 governed tools (19 read-only +
@@ -59,6 +61,12 @@ locks down anything it can't prove safe, and keeps AI agents inside their box.
   marker turning up somewhere is strong evidence, not a guarantee).
 - Locks its own files, disguises itself, kills itself if peeked at, unfreezes
   via a separate sentinel, and auto-restores tampered system files.
+- **Remembers attackers** by what they go after, not their IP or tool, and
+  learns from what a contained attacker keeps trying (shadow mode by default).
+- **Your machines watch each other** (`mg-fleet`, beta-37): signed heartbeats,
+  and a machine is flagged only when two others agree.
+- **Explains itself:** `sudo mg-explain` says what it decided and why, and for
+  confirmed rooted malware, how to remove it.
 
 ## Bottom line
 **MiniGuardian keeps untrustworthy things in a box they can't break out of —

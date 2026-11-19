@@ -167,6 +167,29 @@ A human then decides, out of band — never the agent:
   sudo sh -c '{ printf "%s\n" "$(cat /run/jayce-operator/miniguard.sock.token)"; echo "tool:reject tool-0"; } | socat - UNIX-CONNECT:/run/jayce-operator/miniguard.sock'
   ```
 
+**Dangerous items (beta-32).** Every queued item is checked by
+`miniguard/src/approval_risk.rs`, a fixed set of rules with no model. An item is
+**red** when it deletes or overwrites a disk, home or system folder, runs code
+you cannot see (decoded text or `curl … | sh`), touches credentials
+(`~/.ssh`, `~/.aws`, `~/.gnupg`, `/etc/shadow`, …), makes something run again
+later (shell rc files, autostart, systemd, cron, `.git/hooks`,
+`authorized_keys`), gains root or leaves the sandbox, hands the machine to a
+remote party, or sends credentials out. A red item:
+
+- has a red pop-up (`⚠ DANGEROUS — …`) listing its reasons in plain words, with
+  hidden text shown decoded, and no Approve or Approve all button: **Review…**
+  opens a dialog where you type the item's name (the file's base name, or the
+  tool name);
+- is approved on every path only with that name: `tool:approve <id>` and the
+  session socket refuse it otherwise ("dangerous item: confirm with its
+  name"); from a terminal, `sudo mg-cli session approve <id> --confirm <name>`;
+- is never approved by Approve all, a group, the timed window or an
+  auto-approve rule.
+
+A Deny that ends the governed session is labelled `Deny — stops the AI
+session` and asks once more. After 10 approvals in 5 minutes, a red prompt
+adds "You have approved N items in the last 5 minutes. Read this one."
+
 Tool calls queued inside an `mg-cli` session (the hook bridge) live in that
 session's own registry: decide them with `sudo mg-cli session review`, which
 the session's Review pop-up opens.
@@ -214,7 +237,8 @@ max_window_minutes = 30
 | Earned trust | `write_file`, `edit_file`, `append_file`, `create_dir`, `apply_patch`, `doc_*` |
 | Timed window | the earned set plus `copy_file`, `ingest_file`, `ingest_document` |
 
-**Never auto-approved, whatever the config:** `run_command`, `network_fetch`,
+**Never auto-approved, whatever the config:** any red (dangerous) item, see
+above; `run_command`, `network_fetch`,
 `ingest_link`, `setenv`; relative paths or paths containing `..`; and any path
 whose literal *or symlink-resolved* form is sensitive — shell rc files, `.ssh`,
 `.gnupg`, `.git/hooks`, `.claude`, `.config`, `.local/share`, `.local/bin`,

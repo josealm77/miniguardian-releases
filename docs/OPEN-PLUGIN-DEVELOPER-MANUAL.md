@@ -421,6 +421,7 @@ ask about one.
 | `v` | run the full governance validation suite (Governance window) |
 | `m` (twice) | migrate a selected process under governance (Governance window) |
 | `c` / `r` | clear the audit trail and threat feed |
+| `n` | acknowledge a campaign RED ALERT |
 | `d` | mute the authority sound |
 | `q` | quit |
 
@@ -429,14 +430,15 @@ ask about one.
 | Key | Action |
 |---|---|
 | `↑` `↓` | select |
-| `Enter` | approve (a group: all of it) |
-| `x` | reject |
+| `Enter` | approve (a group: all of it except red items; a red item: type its name first) |
+| `x` | reject (one that ends an AI session asks for a second `x`) |
 | `o` | expand or collapse a group |
 | `s` | approve-global (unregistered tools only) |
 | `w` | open or close the timed auto-approve window (if enabled in config) |
 
-The header shows the machine's state (`CALM` / `SUSPICIOUS` / `HOSTILE` /
-`QUARANTINED`). The Engine Status panel shows the kernel engines, the
+Rows are green (Enter is fine), yellow (look first) or blinking red
+(dangerous, with its reasons listed). The header shows the machine's state
+(`CALM` / `SUSPICIOUS` / `HOSTILE` / `QUARANTINED`). The Engine Status panel shows the kernel engines, the
 ransomware monitor, the seal and the proof label.
 
 ### TRust terminal
@@ -459,7 +461,7 @@ Commands with a handler in this build. Type `help <command>` for details.
 ### Forensics from a shell
 
 ```bash
-sudo bash scripts/mg_explain.sh [30m|2h] [--dig]    # one digest of what happened and why
+sudo mg-explain [30m|2h] [--dig]                    # one digest of what happened and why
 sudo mg-cli session review                          # an AI session's waiting items
 ```
 
@@ -499,6 +501,12 @@ sudo mg-cli session review                          # an AI session's waiting it
 **How long:** pending items wait 30 minutes, then they are rejected.
 Connections to a new host are held up to 90 seconds; after that, the next
 attempt follows the owner's answer.
+
+**Dangerous items** (beta-32) — destructive commands, hidden code,
+credentials, things that run again after a restart, root or sandbox escape,
+remote control — are red, say why, and are approved only by typing the item's
+name. Approve all, groups, the timed window and auto-approve never approve
+them.
 
 **Auto-approve** is optional and off by default. It covers operator rules,
 earned trust, or a short timed window that the owner opens from the TUI

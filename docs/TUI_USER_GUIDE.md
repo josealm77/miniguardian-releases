@@ -29,6 +29,11 @@ The header (`MINI GUARDIAN`) carries the system's overall posture:
 - **`N detected  N kills  N blocks  N restores`** — lifetime counters:
   threats detected, enforcer kills (processes terminated), blocks (IPs/exec
   denied), and restores (system files rolled back to baseline).
+- **Installed version** (beta-37) — the corner of the `MINI GUARDIAN` box
+  shows the installed package version (read from `dpkg-query` / `rpm`).
+- **`PENTEST WINDOW Nm left`** (beta-37) — a red banner in place of the
+  counters while an `mg-pentest` window is open (`… awaiting approval` while
+  it waits for your pop-up). See `TRUST_COMMAND_MANUAL.md` §1a.
 
 Footer: `q: quit  a: AI  g: governance  e: developmental  t: approvals  k:
 kernel judge  v: validate  c/r: clear  [d] mute`.
@@ -82,6 +87,17 @@ canonical kernel sources through the `jayce_kernel` port.
 | **Mitigated** | events mitigated |
 | **Void Pit** | packets swallowed by the void pit (dropped black-hole) |
 | **In-flight** | packets currently in flight through the guard |
+
+**Campaigns (beta-33).** Below the DDoS figures, one row per attack campaign
+the campaign memory is tracking, recognised campaigns first. When a campaign
+is recognised in live mode the panel shows a blinking red
+`⚠ RED ALERT — SYSTEM IS BEING ATTACKED — N campaign(s) — press n when noted`;
+press `n` to acknowledge it (the campaign itself is not released — use
+`sudo mg-op campaign release <id>` for that). In shadow mode (the default),
+detections not yet acknowledged are shown in yellow and nothing is blocked.
+While `[campaign] treat_as_outside` is set for a pentest, a yellow line says
+`test mode: N address(es) treated as outside — remove [campaign]
+treat_as_outside after the test`.
 
 ### Network & Process
 
@@ -365,11 +381,39 @@ that way. The title shows `N pending` and
 the auto-approve posture (`auto-approve off`, or the number of rules, earned
 trust, and a running `WINDOW Nm left`).
 
+**Colours (beta-32).** Every row is drawn in one colour that says what
+pressing `Enter` would do:
+
+- **green** — Enter is fine: an ordinary edit or create, a read-only tool,
+  a file action that is not risky;
+- **yellow** — look first: commands, network, risky file actions,
+  unregistered tools, downloads, held kills;
+- **red, blinking, with `⚠`** — dangerous: deletes or overwrites a disk,
+  home or system folder, runs hidden code (decoded or downloaded-and-run),
+  touches your credentials, makes something run again after a restart, gains
+  root or leaves the sandbox, hands the machine to a remote party, or sends
+  credentials out. A held kill of your own build tools (`ld`, `cc`, `gcc`,
+  `clang`, `rustc`, `cargo`, test programs under `target/`) is red too.
+  Each reason is listed under the row in plain words, and hidden text is
+  shown decoded (`Decoded: …`). The title says `⚠ N dangerous waiting`.
+
+**Red items need their name typed.** `Enter` on a red row asks
+`Dangerous: type <name> and press Enter to approve (Esc cancels)`; the name is
+the file's base name or the tool's name. A group, Approve all, the timed
+window and auto-approve rules never approve a red item: `Enter` on a group
+approves only its other members and says how many dangerous ones are left.
+
+**A Deny that ends the AI session asks twice.** `x` on a session file item
+(`fv-…`) shows `Stop the AI session? press x again`; any other key cancels.
+
+After 10 approvals within 5 minutes, a red prompt adds "You have approved N
+items in the last 5 minutes. Read this one."
+
 | Key | Effect |
 |-----|--------|
 | `↑` / `↓` | select a request |
-| `Enter` | **approve** (a `×N` group: all N) |
-| `x` | **reject** (a group: all of it; a rejected `file` item ends that governed session, like a hard block) |
+| `Enter` | **approve** (a `×N` group: all its non-red items; a red item: type its name first) |
+| `x` | **reject** (a group: all of it; a rejected `file` item ends that governed session, like a hard block, so it asks for a second `x`) |
 | `o` | expand / collapse the group under the cursor |
 | `s` | **approve-global** (`xN` only) — admit the tool and persist it to `[ai_gate] extra_allowed_tools` |
 | `w` | open / close the **timed auto-approve window** (needs `[auto_approve] enabled = true`; see `GOVERNED_TOOLS_REFERENCE.md`) |
@@ -516,6 +560,7 @@ Pressing `space` acknowledges and dismisses it.
 | `r` | reset the selected agent to baseline (Developmental detail view only) |
 | `Tab`, then `b` twice | select an agent in the AI Constitution box, then raise it one privilege level (first `b` asks, second confirms; `Esc` cancels) (Developmental page) |
 | `↑` / `↓`, `Enter`, `x`, `o`, `s`, `w` | select / approve / reject / expand-collapse a group / approve-global (`xN` only) / timed auto-approve window (Tool Approvals page) |
+| `n` | acknowledge the campaign RED ALERT shown on the main page |
 | `space` | acknowledge the Authority Required modal |
 | `d` | mute/unmute the authority-modal terminal ding |
 | (resize) | immediate redraw / layout reflow |
