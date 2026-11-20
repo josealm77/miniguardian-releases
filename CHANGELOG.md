@@ -2,6 +2,16 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-39 — Fri Nov 20 2026
+
+**`mg-why` now explains problems with Linux itself, not only with your code.**
+
+- **System errors get a cause and a next step.** When a command fails because of the system rather than a program bug — a driver that won't load, a full or read-only disk, another install holding the package lock, a missing or failed systemd service, a port already in use, a name that can't be looked up, "Permission denied" or "Operation not permitted" — `mg-why` (and `why` / `suggest` in the TRust terminal) now says what went wrong and what to try, instead of "no known fix".
+- **It reads the kernel's own log when you let it.** Some reasons only the kernel knows: kernel lockdown, AppArmor, seccomp, out-of-memory kills. Run `sudo mg-why -- <command>` and it reads the kernel log lines from while your command ran, names the exact reason and shows the lines. Without `sudo` it tells you when the kernel log may hold the answer. AI agents never receive those lines.
+- **A `sudo` run lands in your own history,** so `mg-why last` and the terminal's `suggest` find it.
+- **Add your own rules** in `~/.config/miniguard/system/*.toml` (yours are checked first).
+- **A new device doesn't work?** If a webcam, headset or other new device does nothing, run `sudo mg-why -- modprobe <driver>` (for most webcams: `uvcvideo`). If the kernel refuses the driver, a reboot loads it.
+
 ## 0.9.1-beta-38 — Fri Nov 20 2026
 
 **No more frozen editors and builds, downloads that always get checked, and a terminal that suggests fixes.**

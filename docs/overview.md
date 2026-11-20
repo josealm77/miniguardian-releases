@@ -1,7 +1,7 @@
 # MiniGuardian — Overview
 
 *Status as of 2026-09-19, re-checked against the source 2026-09-26,
-2026-11-13 (beta-31), 2026-11-19 (beta-37) and 2026-11-20 (beta-38). The
+2026-11-13 (beta-31), 2026-11-19 (beta-37) and 2026-11-20 (beta-38, beta-39). The
 2026-09-19 evidence is in an internal claims-audit report (not published;
 reviewers can ask for it). Numbers carry
 the date they were measured.*
@@ -53,7 +53,7 @@ the kernel can also run on its own in QEMU.
 | Download guard | Executable downloads are quarantined until you release them | Implemented; from beta-38 files over ~100 MB are checked too and every decision is kept on disk |
 | Open plugins | Plugins in any language in a sandbox; every action checked against what you approved at install (`mg-plugin`) | Implemented (beta-29) |
 | Egress proxy | Plugin commands (and, opt-in, AI sessions) reach the internet only through MiniGuardian's proxy; new sites ask | Implemented (beta-29) |
-| `mg-why` | Explains why a program failed, in any language, secrets masked | Implemented (beta-29); next steps for common errors in 7 languages and `suggest` in the terminal (beta-38) |
+| `mg-why` | Explains why a program failed, in any language, secrets masked | Implemented (beta-29); next steps for common errors in 7 languages and `suggest` in the terminal (beta-38); Linux system errors and, as root, the kernel log (beta-39) |
 | Owner-signed antibody feed | Attack patterns you sign travel to your other machines; a match is reported and watched, never blocks by itself | Implemented (beta-38); bundles are copied by hand (fleet distribution not yet built) |
 | Leak guard | Before a governed AI session publishes, credentials are refused and personal information is flagged | Implemented (beta-30) |
 | Host supply-chain scan | `sudo mg-supply host-scan`: projects, tools and system packages against public advisories; system files against their packages; local report only | Implemented (beta-31) |
