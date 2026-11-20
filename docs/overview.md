@@ -1,7 +1,7 @@
 # MiniGuardian — Overview
 
 *Status as of 2026-09-19, re-checked against the source 2026-09-26,
-2026-11-13 (beta-31) and 2026-11-19 (beta-37). The
+2026-11-13 (beta-31), 2026-11-19 (beta-37) and 2026-11-20 (beta-38). The
 2026-09-19 evidence is in an internal claims-audit report (not published;
 reviewers can ask for it). Numbers carry
 the date they were measured.*
@@ -42,7 +42,7 @@ the kernel can also run on its own in QEMU.
 | Jayce kernel | 44 deterministic engines, boots in QEMU from `artifacts/kernel/jayce-kernel.iso` | Implemented as source and a QEMU image |
 | Kernel as a "judge" | The daemon launches the kernel in QEMU (as `nobody`, seccomp, no network) and every decision must agree with it | Implemented; on in the shipped config (`[kernel_vm] judge_mode = "strict"`) |
 | Kernel vitals in the TUI | Live kernel counters on the `k` page of `miniguard-status` | Implemented; read from a serial log and marked unverified |
-| TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 67 of the 159 catalogued commands are not implemented here, and are marked as such (see below; counted from the code 2026-11-13). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands |
+| TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 42 of the 144 catalogued commands are not implemented here, and are marked as such (see below; counted from the code 2026-11-20). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands |
 | Cosmic Map | 2D fleet observatory | **Not available in this beta**: `miniguard --map` prints a "not available" message; the `cosmic_map` crate still builds a standalone binary that is not installed |
 | Attack immunity | Every contained attack is remembered and refused at its first step next time, after a restart and under a new name or path (`sudo mg-op immunity list`) | Implemented (beta-27) |
 | Campaign memory | Recognises an outside attacker by what it goes after and in what order, across IP, tool and timing changes; learns antibodies from a contained attacker (`sudo mg-op campaign list`) | Implemented (beta-33); **shadow mode by default** (reports only) until `[campaign] mode = "live"` |
@@ -50,10 +50,11 @@ the kernel can also run on its own in QEMU.
 | `mg-explain` | What the daemon decided and why, starting with an "at a glance" health list | Implemented (beta-25; at a glance beta-37) |
 | AI-edit trail | Every file change a governed AI session makes is recorded where the AI cannot change it | Implemented (beta-37); the code-map tool that reads it is not shipped yet |
 | `mg-pentest` | A time-limited window in which named pentest tools may reach named targets from this machine | Implemented (beta-37); developer feature, needs a licence signed by Jayce Automata Research for the machine and an owner approval |
-| Download guard | Executable downloads are quarantined until you release them | Implemented |
+| Download guard | Executable downloads are quarantined until you release them | Implemented; from beta-38 files over ~100 MB are checked too and every decision is kept on disk |
 | Open plugins | Plugins in any language in a sandbox; every action checked against what you approved at install (`mg-plugin`) | Implemented (beta-29) |
 | Egress proxy | Plugin commands (and, opt-in, AI sessions) reach the internet only through MiniGuardian's proxy; new sites ask | Implemented (beta-29) |
-| `mg-why` | Explains why a program failed, in any language, secrets masked | Implemented (beta-29) |
+| `mg-why` | Explains why a program failed, in any language, secrets masked | Implemented (beta-29); next steps for common errors in 7 languages and `suggest` in the terminal (beta-38) |
+| Owner-signed antibody feed | Attack patterns you sign travel to your other machines; a match is reported and watched, never blocks by itself | Implemented (beta-38); bundles are copied by hand (fleet distribution not yet built) |
 | Leak guard | Before a governed AI session publishes, credentials are refused and personal information is flagged | Implemented (beta-30) |
 | Host supply-chain scan | `sudo mg-supply host-scan`: projects, tools and system packages against public advisories; system files against their packages; local report only | Implemented (beta-31) |
 | Your own fleet | `mg-fleet` enrolls your machines; they find each other on the local network, exchange signed heartbeats and flag a machine that goes silent or changes (two must agree) | Implemented (beta-37); **not yet tested across two machines** |
@@ -141,8 +142,8 @@ records why; it may have been deliberate hardening.
 226 registered command handlers (60 modules under `commands/`). MiniGuardian carries the
 Smart Terminal part (shell, analyzers, language adapters, tools) and the catalog of names, but
 not the registry or those handlers. Many were ported in November 2026 on real state
-only (no canned output). Counted from the code on 2026-11-13: 159 catalog names, of
-which **67 are catalogued but not implemented**; the rest run natively, are ordinary
+only (no canned output). Counted from the code on 2026-11-20: 144 catalog names, of
+which **42 are catalogued but not implemented**; the rest run natively, are ordinary
 host programs, or are documented subcommand forms. `commands` lists the catalog with the unavailable ones
 marked, and running one prints a clear message (exit 127). The earlier "200+ commands" figure was the SDK's count
 (226), not this build's.
@@ -180,10 +181,10 @@ example program. One known evasion is recorded in code, in the test
 |---|---|---|
 | Kernel engines | 44 | `ENGINE_COUNT` in `jayce_kernel_src/src/kernel/engines/mod.rs` |
 | Governed tools | 52 (19 read-only, 33 approval-gated; counted 2026-11-13) | `ToolRegistry::new()` in `trust_terminal/src/terminal/smart_terminal/tool_system.rs` |
-| Terminal commands | 159 catalog names, 67 not implemented (counted 2026-11-13) | `COMMAND_CATALOG` and `NOT_IMPLEMENTED` in `trust_terminal/src/terminal/smart_terminal/command_reference.rs` |
+| Terminal commands | 144 catalog names, 42 not implemented (counted 2026-11-20) | `COMMAND_CATALOG` and `NOT_IMPLEMENTED` in `trust_terminal/src/terminal/smart_terminal/command_reference.rs` |
 | Inline languages | 18, plus Apodeixis | `trust_terminal/src/terminal/smart_terminal/builtin.rs` |
 | Tests | about 2,260 `#[test]` functions across the workspace (counted 2026-09-19) | `grep -r '#\[test\]'` |
-| Daemon unit tests | 2,478 passed, 2 failed, 26 ignored (2026-11-19, run inside a governed AI session; the 2 failures are health-server tests that open a TCP connection, which the session's sandbox refuses) | `cargo test -p miniguard --lib --release` |
+| Daemon unit tests | 2,505 passed, 2 failed, 26 ignored (2026-11-20, run inside a governed AI session; the 2 failures are health-server tests that open a TCP connection, which the session's sandbox refuses) | `cargo test -p miniguard --lib --release` |
 | Status TUI tests | 25 passed (2026-09-19) | `cargo test -p miniguard-status` |
 | Terminal tests | 196 unit + 11 v2 integration passed (2026-09-19) | `cargo test -p trust_terminal` |
 

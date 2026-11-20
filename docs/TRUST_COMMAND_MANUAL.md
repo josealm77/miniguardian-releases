@@ -1,8 +1,8 @@
 # 🛡️ TRust Smart Terminal — Complete Command Reference Manual
 
-> **Status (from the code, 2026-11-13).** This manual documents the command catalog
+> **Status (from the code, 2026-11-20).** This manual documents the command catalog
 > inherited from the Jayce SDK's TRust Terminal, which registers 226 commands there. This
-> build's catalog has **159 names; 67 are catalogued but not implemented here**. The rest
+> build's catalog has **144 names; 42 are catalogued but not implemented here**. The rest
 > execute natively (including the SDK port of November 2026: `ada`, `nlmg`, `pattern`,
 > `curiosity`, `sys-*`, `telemetry`, `timer`, `note`, `todo`, `focus`, `scaffold`, `build`,
 > `check`), are ordinary host programs (`ls`, `cat`, `git` and similar, which work when
@@ -15,6 +15,28 @@
 *Jayce Microkernel, IronPilot Robotics & MiniGuardian Security Substrate v0.9.1-beta*
 
 ---
+
+
+## New in beta-38
+
+Typed by a person in `trust_terminal` (they never run for AI agents or scripts):
+
+| Command | What it does |
+| :--- | :--- |
+| `history [n]`, `history search <text>`, `history clear` | Your earlier commands (kept between sessions). |
+| `alias <name> = <command>`, `alias`, `unalias <name>` | Short names for commands. An alias can never replace an existing command. |
+| `write <file> <text>`, `append <file> <text>` | Write or add a line to a file, with your own permissions. Symlinks are refused. |
+| `edit <file>` | Opens the file in your editor (`$VISUAL`, `$EDITOR`, else nano or vi). |
+| `playbook record <name>` … `playbook stop`, `playbook list`, `show <name>`, `run <name>`, `delete <name>` | Record a series of commands and replay it; each step asks before it runs. |
+| `sec` | Security status on one screen (judge, audit chain, seal, campaigns). Needs `sudo`. |
+| `verify` | Checks the installed MiniGuardian programs against the seal. Needs `sudo`. |
+| `approve` | Lists what waits for your approval. It never approves — decide in the dashboard (`t`) or with `sudo mg-cli session approve`. |
+| `suggest` | The next step for your last failure: the last one `why` explained and the last `build`/`check`/`test` failure. |
+
+Names that were a second spelling of an existing command now say which one to use:
+`explain` → `help`, `diag` → `diagnose`, `fix` → `fixes`, `watchdog` / `vital` / `cluster` / `universe` →
+`kernel …`, `metrics` → `telemetry`, `project` / `inspect` → `workspace`, `trust-status` → `sudo mg-explain`,
+`cognitive` → `ada` / `curiosity`, `bubble` → `illusion`, `audit` → `forensic` / `report`, `trace` → `why`.
 
 ## 📌 Table of Contents
 1. [MiniGuardian Local Security & Forensics](#1-miniguardian-local-security--forensics)
@@ -63,7 +85,7 @@ These are host programs installed with MiniGuardian (`/usr/local/bin`; a sealed 
 | **`mg-fleet`** | `sudo mg-fleet init` · `add <name>` · `join <bundle.tar>` · `peer add\|remove <ip>` · `status` | Puts your machines in one fleet: one fleet certificate authority (its key stays on the first machine), a certificate per machine, a shared token, enrollment bundles. Enrolled machines find each other on the local network by themselves. Settings live in `/etc/miniguard-fleet/`, outside the sealed config. Restart MiniGuardian after a change. A bundle holds a private key: copy it, join, then `shred -u` every copy. |
 | **`mg-op fleet:glance`** | `sudo mg-op fleet:glance` | Every fleet peer's latest **signed** status (brain state, judge, containment, held kills, top near-misses), its verdict (healthy / unconfirmed / suspected — suspected needs two machines to agree) and the evidence. Peers observe and report; none acts on another machine. |
 | **`mg-pentest`** | `sudo mg-pentest open --target <ip\|cidr> [--api <host>] (--container <name> \| -- <cmd>) [--for 2h]` · `status` · `close` | Licensed developer feature: a time-limited window in which the named tools may attack the named targets from this machine; they can reach only those targets (plus the AI model's API) and every other protection still applies to them. Needs a licence signed for this machine and your approval on a red pop-up (type `PENTEST`). Says READY only once the network lock is in place. |
-| **`mg-map`** | `mg-map index\|overview\|where <name>\|callers <name>\|impact <name>\|vars <fn>\|changes\|failures\|ai-edits\|list\|clear [--all]` `[--dir <path>] [--json] [--tests]` | Developer tool (not in the beta package yet): maps a project's own code (Python, JavaScript, Rust) — where things are defined, who calls what, what depends on a function, a function's variables, what changed since `index`, where `mg-why` failures happened, and which files an AI session last wrote. Reads, never runs; libraries stay named boxes. `--json` for AI agents. `sudo mg-map ai-edits clear [--all]` erases the AI-edit trail. |
+| **`mg-map`** | `mg-map index\|overview\|where <name>\|callers <name>\|impact <name>\|vars <fn>\|changes\|failures\|ai-edits\|list\|clear [--all]` `[--dir <path>] [--json] [--tests]` | Developer tool (not in the beta package yet; on a dev machine `seal.sh` installs it once built with `cd code_map && cargo build --release`): maps a project's own code (Python, JavaScript, Rust) — where things are defined, who calls what, what depends on a function, a function's variables, what changed since `index`, where `mg-why` failures happened, and which files an AI session last wrote. Reads, never runs; libraries stay named boxes. `--json` for AI agents. `sudo mg-map ai-edits clear [--all]` erases the AI-edit trail. |
 | **`mg-why`** | `mg-why -- <command…>` | Runs a program and, if it fails, says where in your own code it broke, what caused it and which processes were involved (any language with a language file). |
 
 ---

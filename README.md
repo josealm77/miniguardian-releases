@@ -17,13 +17,15 @@ Almendarez**, Jayce Automata Research.
   independent antifreeze sentinel, shadow copies of critical files and a
   hash-chained audit log.
 - **Attack immunity.** It acts during an attack and learns from it:
-  - ransomware is paused mid-run and the files are restored;
+  - ransomware is paused mid-run and the files are restored, while editors,
+    git and builds that rewrite many files are recognised and let go;
   - an attack it stopped once is refused at its first step next time, after
     a restart and under a new name or path;
   - every attack it survives makes the machine harder to attack again;
   - a persistent outside attacker is recognised by what it goes after, even
     when it changes its IP, tools and timing (campaign memory; reports only
-    until you switch it to live).
+    until you switch it to live), and the patterns you sign can travel to
+    your other machines.
 - **Dangerous approvals can't be approved by reflex.** Destructive commands,
   hidden code, your credentials and anything that would run again after a
   restart are shown in red with the reason, and are approved only by typing
@@ -33,7 +35,8 @@ Almendarez**, Jayce Automata Research.
   changes is flagged when two others agree. No machine acts on another.
 - **It explains itself.** `sudo mg-explain` says what MiniGuardian decided
   and why, starting with one line per part, and for confirmed rooted malware
-  lists the steps to remove it.
+  lists the steps to remove it. In the TRust terminal, `why` explains a
+  failed program and `suggest` gives the next step.
 - **Kernel judge.** An independent copy of the decision engines runs in its
   own small VM and must agree with every decision, so taking over root alone
   is not enough to change what MiniGuardian decides.
@@ -75,7 +78,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-37)
+## Install the beta (0.9.1-beta-38)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -83,25 +86,25 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-37 && cd ~/miniguard-0.9.1-beta-37
-for f in miniguard_0.9.1-beta-37_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-37/$f
+mkdir -p ~/miniguard-0.9.1-beta-38 && cd ~/miniguard-0.9.1-beta-38
+for f in miniguard_0.9.1-beta-38_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-38/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-37_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-38_amd64.deb
 ```
 
 <!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-37 && cd ~/miniguard-0.9.1-beta-37
-for f in miniguard-0.9.1-37.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-37/$f
+mkdir -p ~/miniguard-0.9.1-beta-38 && cd ~/miniguard-0.9.1-beta-38
+for f in miniguard-0.9.1-38.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-38/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-37.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-38.x86_64.rpm
 ```
 <!-- fedora-install-end -->
 

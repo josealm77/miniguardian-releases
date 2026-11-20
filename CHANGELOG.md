@@ -2,6 +2,20 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-38 — Fri Nov 20 2026
+
+**No more frozen editors and builds, downloads that always get checked, and a terminal that suggests fixes.**
+
+- **Editors, git and builds are no longer frozen as ransomware.** When something overwrites many files in your protected folders at once, MiniGuardian still freezes it immediately. It now also compares the overwritten files with the copies it took just before each write. If they still hold the same kind of content (text stays text, an image keeps its header), the program is resumed automatically and the decision is logged. If they turned into random-looking data, lost their file-type header or disappeared, it stays frozen for your decision. The ransomware drill is still caught.
+- **The file vault switches itself back on** a minute after a stall, instead of staying off until a restart. While it is off, a high write rate alone no longer freezes anything (that froze `ld`, test builds and `git clone`).
+- **Downloads:** Chrome's in-progress files no longer leave a download approval that cannot be approved or rejected. Files larger than about 100 MB are now checked (they were skipped because of a memory limit). Every decision on a downloaded program or archive is kept on disk and listed by `sudo mg-explain`.
+- **A lost kernel judge recovers by itself.** If the judge stops after start-up, MiniGuardian restarts itself after 2 minutes to start a fresh one (at most 3 times an hour), instead of staying in PARANOID until you restart it. `mg-explain` lists these as deliberate restarts.
+- **Packages can add system groups again.** Installing a package that adds a group or system account (for example Docker's `docker` group) is no longer undone. Only additions of plain system entries during a package install are kept; any edit of an existing account, a new root account, a new member of a group or a real password is still rolled back. To keep another change on purpose: `sudo mg-op shadow accept /etc/group`.
+- **Antibodies you sign travel to your other machines.** When MiniGuardian contains an attack it learns its pattern. `sudo mg-op campaign antibody export <id>` turns one into a proposal; you sign it offline with `miniguard-license antibody-sign` and copy the bundle to `/etc/miniguard/antibodies.json` on each machine. Only your signature is accepted, every antibody expires, and anything carrying a user name or home-folder path is refused. On another machine a match is reported and watched — it never blocks anything by itself. `sudo mg-op campaign feed` lists them.
+- **The dashboard has a fleet page** (key `f`): each of your machines, its status as its peers see it, its last heartbeat and what the others report. The key list at the bottom now fits any window width.
+- **Quieter, more truthful start-up.** File-guard snapshots and recovery backups now work (their folders were read-only). The false "no kernel lockdown", "no TPM", "shroud install failed" and network-filter warnings are gone, older AI-behaviour records are accepted again, and `mg-explain` dates old crash reports so they are not mistaken for new ones.
+- **TRust terminal:** new commands `history`, `alias`, `write` / `append`, `edit`, `playbook` (record and replay, asking before each step), `sec` (security status on one screen), `verify` (installed programs against the seal), `approve` (what waits for you — it lists, it never approves) and `suggest` (the next step for your last failure). `why` now says what to try for common errors in Python, JavaScript, Rust, Go, Java, Ruby and C. Old duplicate names (`explain`, `diag`, `metrics`, …) tell you which command to use, and the built-in `git status` works on packed repositories. Commands that change files or settings work only when a person is typing, never for AI agents.
+
 ## 0.9.1-beta-37 — Wed Nov 18 2026
 
 **Slower machines no longer get stuck in PARANOID, and a developer pentest mode.**

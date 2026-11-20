@@ -550,6 +550,7 @@ Pressing `space` acknowledges and dismisses it.
 | `e`, `E` | open or refresh Developmental Governance (page 3) |
 | `t`, `T` | open or refresh Tool Approvals (page 4) |
 | `k`, `K` | open or refresh Kernel Judge evidence (page 5) |
+| `f`, `F` | open the Fleet page (page 6): each of your machines, its verdict (healthy / unconfirmed / suspected), last heartbeat, build, TPM, state, and what the other machines report; `f` again goes back. Read-only — accepting a new build stays `sudo mg-op fleet:accept <node> build=<b>` |
 | `c`, `C`, `r`, `R` | (except `r` in the agent detail view, see page 3) clear the audit trail + live feed and wipe transient counters — but NOT the daemon's cumulative lifetime counters (Engine Status, DDoS, blocked IPs, kills/blocks/restores, telemetry). Those keep their values, and the live feed refills on the next tick. See note below. |
 | `v`, `V` | run the live governance validation suite (gov page) |
 | `m`, `M` | arm / confirm governed migration of the selected ungoverned PID (gov page) |
