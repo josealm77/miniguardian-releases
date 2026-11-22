@@ -2,6 +2,18 @@
 
 All notable user-facing changes by beta release.
 
+## 0.9.1-beta-40 — Sat Nov 21 2026
+
+**About 80% less CPU when idle, a TRust terminal that works like your normal shell, and IPv6 attackers blocked like IPv4 ones.**
+
+- **Much lighter on the machine.** On a desktop, MiniGuardian went from about 3.7 to 0.67 seconds of CPU per idle minute (two measurements before, two after). Most of it comes from a small memory cache MiniGuardian now keeps in front of the system's memory allocator, written in-house with no new dependencies and checked with Rust's Miri; the library scan also skips lines that cannot name a library. The full threat drill passes on the new build.
+- **The TRust terminal works like your normal shell.** Programs and shell syntax you type now run in bash with your terminal attached: `&&`, `;`, `~`, wildcards, loops, `$((…))`, `nano`, `less`, `top`, `python3`, `sudo` password prompts and live output, with no time or output limit. Ctrl-C stops the program, not the terminal, `cd` / `export` carry over to the next line, and the functions and aliases from your `~/.bashrc` work too (for example `mgx`). All the investigation tools run from it: `why`, `suggest`, `mg-why`, `mg-map`, `mg-supply`, and with `sudo` `mg-explain`, `mg-op` and `mg-fleet`. TRust's own commands work as before, and every line still passes the prompt guard and the AI containment check first. AI sessions keep their limited, checked path.
+- **`help` lists every command you can use.** It was missing 24 (from `ls`, `grep` and `git` to `playbook` and `history`); `commands` still shows the full catalogue.
+- **IPv6 attackers are remembered and blocked like IPv4 ones:** each attacker's /64 network, and its /48 once three of them come from it. IPv6 floods are throttled the same way as IPv4 ones. Your own networks, link-local and private ranges are never blocked as a whole. (Flood mode has not yet been tested against a real flood from a second machine.)
+- **Security fixes in the governed AI tools.** The read-only git tools could be made to write a file without your approval; an email subject could add a hidden `Bcc:` recipient; a few tools read a value starting with `-` as an option. All fixed, and all 52 governed tools are now tested end to end. The clipboard and screenshot tools now name the program they need when it is missing (`wl-clipboard`, `grim`).
+- **Build and supply chain.** Built with Rust 1.100. New dependency versions are used only after they have been public for 7 days, an unused dependency stops the build, and `mg-supply` flags a dependency a crate declares but never uses (its build script would run for nothing).
+- **Tip:** if `trust_terminal` behaves like an old version, run `type -a trust_terminal` — an older copy in `~/.local/bin` can come first on your PATH.
+
 ## 0.9.1-beta-39 — Fri Nov 20 2026
 
 **`mg-why` now explains problems with Linux itself, not only with your code.**

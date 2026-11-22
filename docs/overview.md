@@ -1,7 +1,7 @@
 # MiniGuardian — Overview
 
 *Status as of 2026-09-19, re-checked against the source 2026-09-26,
-2026-11-13 (beta-31), 2026-11-19 (beta-37) and 2026-11-20 (beta-38, beta-39). The
+2026-11-13 (beta-31), 2026-11-19 (beta-37), 2026-11-20 (beta-38, beta-39) and 2026-11-21 (beta-40). The
 2026-09-19 evidence is in an internal claims-audit report (not published;
 reviewers can ask for it). Numbers carry
 the date they were measured.*
@@ -29,20 +29,20 @@ the kernel can also run on its own in QEMU.
 | Area | What it does | Status |
 |---|---|---|
 | Host protection daemon | Process, file, memory, network and browser-surface detectors feeding a threat "brain" | Implemented |
-| Enforcement | eBPF and iptables blocking, kill, quarantine, restore from shadow copies | Implemented. By default it only blocks in Hostile/Paranoid; Calm and Suspicious observe |
+| Enforcement | eBPF and iptables blocking, kill, quarantine, restore from shadow copies | Implemented. By default it only blocks in Hostile/Paranoid; Calm and Suspicious observe. From beta-40 IPv6 too: remembered attackers' /64 (and /48 after three) and IPv6 flood throttling in the XDP program; flood mode not yet tested against a real flood |
 | Antifreeze sentinel | Separate process that un-freezes a stopped daemon (SIGCONT) and restarts it after repeated freezes | Implemented |
 | Sealing | Immutable binaries and a hash manifest, re-checked about every 2 minutes | Implemented |
 | `mg-cli` governor | Runs an AI tool under Landlock: file sandbox plus **default-deny TCP** (kernel 6.7+), a proof-checked action gate, a fake-response layer for escape attempts, a dependency check before launch, and (under sudo, CLI tools) no access to the desktop: X server, session D-Bus and Wayland sockets are hidden so the agent cannot fake pointer or keyboard input | Implemented (desktop isolation added 2026-09-26) |
 | Human approval | Queued actions (tool calls, unregistered tools, risky file actions) raise a desktop pop-up with **Approve**, **Deny** and **Review**; approving a session's file action asks for your password (pkexec), and the TUI's approvals page decides the same queue. From beta-31 a pop-up whose item was already decided asks no password | Implemented, in daily use |
 | Dangerous approvals | Destructive commands, hidden code, credentials, persistence, root/sandbox escape and remote control are red, list their reasons, and are approved only by typing the item's name; no group, window or rule approves them | Implemented (beta-32) |
-| Governed tools | 52 built-in tools; reading is automatic, writing, running, deleting, network and memory ingest wait for human approval | Implemented |
+| Governed tools | 52 built-in tools; reading is automatic, writing, running, deleting, network and memory ingest wait for human approval | Implemented; all 52 tested end to end from beta-40 (network, desktop and push parts run outside a governed session) |
 | Content scanners | Prompt-injection guard, memory-poisoning scanner, tool-call gate, exposed on a read-only local socket | Implemented (see limits) |
 | Identity firewall | UID-scoped UDP policy for the governed account | Implemented, **off by default** (shadow mode first) |
 | AI envelope (tagging, per-tool egress, GUI exec interception) | Detects AI tools and tags them | **Detection only**; the enforcement parts are planned |
 | Jayce kernel | 44 deterministic engines, boots in QEMU from `artifacts/kernel/jayce-kernel.iso` | Implemented as source and a QEMU image |
 | Kernel as a "judge" | The daemon launches the kernel in QEMU (as `nobody`, seccomp, no network) and every decision must agree with it | Implemented; on in the shipped config (`[kernel_vm] judge_mode = "strict"`) |
 | Kernel vitals in the TUI | Live kernel counters on the `k` page of `miniguard-status` | Implemented; read from a serial log and marked unverified |
-| TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 42 of the 144 catalogued commands are not implemented here, and are marked as such (see below; counted from the code 2026-11-20). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands |
+| TRust Smart Terminal (the TRust terminal) | Command shell with Prompt Guard on every input, 18 inline languages plus Apodeixis, and the governed tool system | **Partial.** The shell, analyzers and tools work; 42 of the 144 catalogued commands are not implemented here, and are marked as such (see below; counted from the code 2026-11-20). Standalone `trust_terminal` binary (v0.1.0, `miniguard --terminal` starts it) and linked into the daemon for `term:` commands. From beta-40 the interactive terminal hands lines it does not own to bash with the terminal attached (full shell syntax, full-screen programs, no time/output limit) after the same prompt guard and containment check; the agent path is unchanged |
 | Cosmic Map | 2D fleet observatory | **Not available in this beta**: `miniguard --map` prints a "not available" message; the `cosmic_map` crate still builds a standalone binary that is not installed |
 | Attack immunity | Every contained attack is remembered and refused at its first step next time, after a restart and under a new name or path (`sudo mg-op immunity list`) | Implemented (beta-27) |
 | Campaign memory | Recognises an outside attacker by what it goes after and in what order, across IP, tool and timing changes; learns antibodies from a contained attacker (`sudo mg-op campaign list`) | Implemented (beta-33); **shadow mode by default** (reports only) until `[campaign] mode = "live"` |

@@ -38,6 +38,12 @@ Almendarez**, Jayce Automata Research.
   lists the steps to remove it. In the TRust terminal, `why` explains a
   failed program and `suggest` gives the next step, including errors from
   Linux itself; `sudo mg-why -- <command>` also reads the kernel's log.
+- **A terminal you don't have to leave.** The TRust terminal runs your
+  normal commands, shell syntax and full-screen programs (editors, `top`,
+  `sudo` prompts) with live output, and checks every line with the prompt
+  guard first; `help` lists everything you can use.
+- **Light on the machine.** About 0.7 seconds of CPU per idle minute on a
+  desktop (from beta-40).
 - **Kernel judge.** An independent copy of the decision engines runs in its
   own small VM and must agree with every decision, so taking over root alone
   is not enough to change what MiniGuardian decides.
@@ -79,7 +85,7 @@ This repository holds the **signed beta packages** (under
 and Jayce kernel source code is private; reviewers and partners can ask for
 access.
 
-## Install the beta (0.9.1-beta-39)
+## Install the beta (0.9.1-beta-40)
 
 Copy and paste the block for your distro. It downloads the package, the
 checksums, the signature and the public key, verifies them, and installs only
@@ -87,25 +93,25 @@ if everything checks out.
 
 **Ubuntu, Pop!_OS, Debian**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-39 && cd ~/miniguard-0.9.1-beta-39
-for f in miniguard_0.9.1-beta-39_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-39/$f
+mkdir -p ~/miniguard-0.9.1-beta-40 && cd ~/miniguard-0.9.1-beta-40
+for f in miniguard_0.9.1-beta-40_amd64.deb SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  wget -q https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-40/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo apt install ./miniguard_0.9.1-beta-39_amd64.deb
+  && sudo apt install ./miniguard_0.9.1-beta-40_amd64.deb
 ```
 
 <!-- fedora-install-start -->
 **Fedora, RHEL, AlmaLinux, Rocky**
 ```bash
-mkdir -p ~/miniguard-0.9.1-beta-39 && cd ~/miniguard-0.9.1-beta-39
-for f in miniguard-0.9.1-39.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
-  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-39/$f
+mkdir -p ~/miniguard-0.9.1-beta-40 && cd ~/miniguard-0.9.1-beta-40
+for f in miniguard-0.9.1-40.x86_64.rpm SHA256SUMS SHA256SUMS.asc JAYCE_RELEASE.asc; do
+  curl -fsSLO https://github.com/josealm77/miniguardian-releases/releases/download/v0.9.1-beta-40/$f
 done
 gpg --import JAYCE_RELEASE.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing \
-  && sudo dnf install ./miniguard-0.9.1-39.x86_64.rpm
+  && sudo dnf install ./miniguard-0.9.1-40.x86_64.rpm
 ```
 <!-- fedora-install-end -->
 
